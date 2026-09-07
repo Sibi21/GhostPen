@@ -136,14 +136,14 @@ When running `make demo` or `make demo-cli`, judges will observe all four verdic
 ## 4. How Scoring Works
 
 ### Deviation Score $S$
-$$S = 0.25 \cdot \Delta(\text{function words}) + 0.25 \cdot \Delta(\text{char 3-grams}) + 0.35 \cdot \text{mean}(|z_{\text{capped}}|) + 0.15 \cdot \text{habit\_penalty}$$
+$$S = 0.25 \cdot \Delta(\text{function words}) + 0.25 \cdot \Delta(\text{char 3-grams}) + 0.35 \cdot \text{mean}(|z_{\text{capped}}|) + 0.15 \cdot \text{habit penalty}$$
 - **Burrows' Delta ($\Delta$)**: Classic distance across relative frequencies normalized by sender variation, with individual $|z| \le 4.0$.
 - **Robust Z-scores**: All training distributions are winsorized at 5th/95th percentiles; standard deviations are floored per family (`EPS`: rates/100w = 0.5, sentence length = 1.0, TTR = 0.01, word length = 0.1, relative frequencies = 0.0005); individual $|z|$ capped at 4.0.
 - **Habit Penalty**: Sum of consistency weights for violated greeting and sign-off habits.
 
 ### Conformal Null Calibration & Verdict Function
 For sender with $N = n_{\text{train}}$ emails, leave-one-out scores yield null distribution $\{s_1, \dots, s_N\}$.
-$$p = \frac{1 + \#\{s_i \ge S\}}{N + 1}, \quad p_{\min} = \frac{1}{N + 1}$$
+$$p = \frac{1 + |\{i : s_i \ge S\}|}{N + 1}, \quad p_{\min} = \frac{1}{N + 1}$$
 
 **Verdict Evaluation Order**:
 1. Sender not enrolled $\to$ `UNENROLLED` (`"no profile; enroll >= floor(1/alpha) for your operating alpha (20 @ 0.05, 50 @ 0.02, 10 @ 0.10)"`)
