@@ -1,0 +1,67 @@
+[
+  {
+    "sender_id": "presto-k",
+    "word_count": 372,
+    "deviation_score": 0.9693,
+    "p_value": 0.0088,
+    "verdict": "ALERT",
+    "broken_habits": [
+      "Punctuation ';': 81 occurrences (0 observed in 112 past emails)",
+      "Punctuation '\u2014': 12 occurrences (0 observed in 112 past emails)"
+    ],
+    "direction": "Style variation within normal baseline",
+    "context_flags": [],
+    "drift_note": "Broken habitual pattern: Punctuation ';': 81 occurrences (0 observed in 112 past emails)",
+    "snippet": "It's the trader's option.  Most will probably not attend.   -----Original Appointment----- From: \tBlack, Tamara Jae   On Behalf Of Imai, Rika Sent:\tTuesday, Oct..."
+  },
+  {
+    "sender_id": "hain-m",
+    "word_count": 41,
+    "deviation_score": 0.9335,
+    "p_value": 0.0088,
+    "verdict": "ALERT",
+    "broken_habits": [],
+    "direction": "Style variation within normal baseline",
+    "context_flags": [],
+    "drift_note": "Unusual phrasing density in holdout message relative to historical training corpus",
+    "snippet": "Thanks for sharing.  She's just adorable!     From: Douglas Nichols/ENRON@enronxgate on 03/24/2001 12:17 PM CST To: Mary Hain/HOU/ECT@ECT cc:   Subject: Fwd: I'..."
+  },
+  {
+    "sender_id": "hain-m",
+    "word_count": 46,
+    "deviation_score": 0.886,
+    "p_value": 0.0177,
+    "verdict": "ALERT",
+    "broken_habits": [],
+    "direction": "Style variation within normal baseline",
+    "context_flags": [],
+    "drift_note": "Unusual phrasing density in holdout message relative to historical training corpus",
+    "snippet": "Congrats and best of luck always!  It couldn't happen to a nicer guy.   From: LEE MARTIN/ENRON@enronxgate on 03/21/2001 03:36 PM CST To: Mary Hain/HOU/ECT@ECT c..."
+  },
+  {
+    "sender_id": "corman-s",
+    "word_count": 406,
+    "deviation_score": 0.8404,
+    "p_value": 0.0088,
+    "verdict": "ALERT",
+    "broken_habits": [
+      "Punctuation ';': 82 occurrences (0 observed in 112 past emails)"
+    ],
+    "direction": "Style variation within normal baseline",
+    "context_flags": [],
+    "drift_note": "Broken habitual pattern: Punctuation ';': 82 occurrences (0 observed in 112 past emails)",
+    "snippet": "Rick  I need you to work out a full budget for this class & the Houston class -- both the customer portion + the individual employee travel expenses that will h..."
+  },
+  {
+    "sender_id": "hain-m",
+    "word_count": 71,
+    "deviation_score": 0.8399,
+    "p_value": 0.0354,
+    "verdict": "ALERT",
+    "broken_habits": [],
+    "direction": "Style variation within normal baseline",
+    "context_flags": [],
+    "drift_note": "Unusual phrasing density in holdout message relative to historical training corpus",
+    "snippet": "Perhaps I'll see you sometime.  I know I'll be going to FERC alot.  Thank you  for all of your help with BPA leg.       \tEnron Capital & Trade Resources Corp. \t..."
+  }
+]

@@ -1,0 +1,866 @@
+{
+  "baseline_comparison_table": [
+    {
+      "FPR_alert_holdout": 0.0152,
+      "FPR_flagged_holdout": 0.0171,
+      "model": "GhostPen (Per-Sender LOO Null)",
+      "precision_at_10pct": 0.766,
+      "precision_at_1pct": 0.2293,
+      "recall_generic_flagged": 0.74,
+      "recall_relabel_flagged": 0.01,
+      "recall_short_flagged": 1.0,
+      "recall_styled_flagged": 0.82
+    },
+    {
+      "FPR_alert_holdout": 0.0095,
+      "FPR_flagged_holdout": 0.0114,
+      "model": "Baseline A (Centroid Cosine TF-IDF)",
+      "precision_at_10pct": 0.7939,
+      "precision_at_1pct": 0.2594,
+      "recall_generic_flagged": 0.28,
+      "recall_relabel_flagged": 0.18,
+      "recall_short_flagged": 1.0,
+      "recall_styled_flagged": 0.82
+    },
+    {
+      "FPR_alert_holdout": 0.0476,
+      "FPR_flagged_holdout": 0.0495,
+      "model": "Baseline B (Global Threshold on S)",
+      "precision_at_10pct": 0.5465,
+      "precision_at_1pct": 0.0987,
+      "recall_generic_flagged": 0.79,
+      "recall_relabel_flagged": 0.05,
+      "recall_short_flagged": 1.0,
+      "recall_styled_flagged": 0.82
+    }
+  ],
+  "bayesian_precision": {
+    "FPR_flagged_at_005": 0.0171,
+    "R_flagged_pooled": 0.5037,
+    "description": "Calculated using flagged rule on both sides: Precision(pi) = R_flagged*pi / (R_flagged*pi + FPR_flagged*(1-pi))",
+    "flags_per_100_genuine_emails": 1.71,
+    "pooling_choice": "Pooled across all 4 forged tiers (relabel, generic, styled, short)",
+    "precision_at_10pct_prevalence": 0.766,
+    "precision_at_1pct_prevalence": 0.2293
+  },
+  "claim_discipline": "the in-sample calibration line is an IMPLEMENTATION SANITY CHECK \u2014 the plug-in p-value is approximately rank-uniform for ANY exchangeable score function, so it verifies arithmetic, not the model. The HOLDOUT line is the evidence; holdout FPR \u2212 in-sample FPR = measured style drift, reported as a finding. Never claim 'holdout FPR = alpha by construction.' LOO nulls are built on n\u22121-email profiles, which inflates them slightly relative to a new message scored against the full n-email profile, so deployment p-values are mildly conservative (FPR <= alpha).",
+  "copy_audit_summary": {
+    "clean_imitation_count": 46,
+    "copy_based_count": 4,
+    "per_record_audit": [
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 17,
+        "sender": "presto-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 18,
+        "sender": "presto-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 13,
+        "sender": "presto-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 16,
+        "sender": "presto-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 15,
+        "sender": "presto-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": true,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 47,
+        "sender": "blair-l",
+        "shared_5grams_count": 7
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 31,
+        "sender": "blair-l",
+        "shared_5grams_count": 2
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 34,
+        "sender": "blair-l",
+        "shared_5grams_count": 2
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 16,
+        "sender": "blair-l",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 16,
+        "sender": "blair-l",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 21,
+        "sender": "corman-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 40,
+        "sender": "corman-s",
+        "shared_5grams_count": 3
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 19,
+        "sender": "corman-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 20,
+        "sender": "corman-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 15,
+        "sender": "corman-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 27,
+        "sender": "cash-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 29,
+        "sender": "cash-m",
+        "shared_5grams_count": 1
+      },
+      {
+        "copy_based": true,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 49,
+        "sender": "cash-m",
+        "shared_5grams_count": 8
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 17,
+        "sender": "cash-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 24,
+        "sender": "cash-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": true,
+        "is_alert": false,
+        "is_flagged": false,
+        "max_lcs_len": 61,
+        "sender": "hain-m",
+        "shared_5grams_count": 7
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 37,
+        "sender": "hain-m",
+        "shared_5grams_count": 5
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 28,
+        "sender": "hain-m",
+        "shared_5grams_count": 2
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 18,
+        "sender": "hain-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 19,
+        "sender": "hain-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": true,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 52,
+        "sender": "guzman-m",
+        "shared_5grams_count": 6
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 31,
+        "sender": "guzman-m",
+        "shared_5grams_count": 2
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 12,
+        "sender": "guzman-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 14,
+        "sender": "guzman-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 13,
+        "sender": "guzman-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 53,
+        "sender": "keiser-k",
+        "shared_5grams_count": 4
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 20,
+        "sender": "keiser-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 18,
+        "sender": "keiser-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 13,
+        "sender": "keiser-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 15,
+        "sender": "keiser-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 25,
+        "sender": "lay-k",
+        "shared_5grams_count": 2
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 19,
+        "sender": "lay-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 15,
+        "sender": "lay-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 19,
+        "sender": "lay-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 19,
+        "sender": "lay-k",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 17,
+        "sender": "neal-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 26,
+        "sender": "neal-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 18,
+        "sender": "neal-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 20,
+        "sender": "neal-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 15,
+        "sender": "neal-s",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 39,
+        "sender": "heard-m",
+        "shared_5grams_count": 1
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 22,
+        "sender": "heard-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 16,
+        "sender": "heard-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 21,
+        "sender": "heard-m",
+        "shared_5grams_count": 0
+      },
+      {
+        "copy_based": false,
+        "is_alert": false,
+        "is_flagged": true,
+        "max_lcs_len": 18,
+        "sender": "heard-m",
+        "shared_5grams_count": 0
+      }
+    ],
+    "total_styled": 50
+  },
+  "detection_definition": "flagged = ALERT OR (TRIAGE AND content_escalation); caught = flagged.",
+  "evaluation_summary": {
+    "high_volume_senders": 10,
+    "total_forged_evaluation_records": 270,
+    "total_holdout_emails": 525,
+    "total_senders": 15,
+    "total_training_emails": 1222
+  },
+  "fpr_variants": {
+    "0.02": {
+      "FPR_alert": 0.0114,
+      "FPR_flagged": 0.0152,
+      "FPR_sanity_in_sample": 0.0033,
+      "alpha": 0.02,
+      "measured_style_drift": 0.0081
+    },
+    "0.05": {
+      "FPR_alert": 0.0152,
+      "FPR_flagged": 0.0171,
+      "FPR_sanity_in_sample": 0.0082,
+      "alpha": 0.05,
+      "measured_style_drift": 0.007
+    },
+    "0.1": {
+      "FPR_alert": 0.0362,
+      "FPR_flagged": 0.0381,
+      "FPR_sanity_in_sample": 0.0155,
+      "alpha": 0.1,
+      "measured_style_drift": 0.0207
+    }
+  },
+  "per_sender_breakdown": {
+    "badeer-r": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 7,
+      "n_train": 15,
+      "sender_id": "badeer-r",
+      "volume_class": "low"
+    },
+    "blair-l": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "blair-l",
+      "volume_class": "high"
+    },
+    "cash-m": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "cash-m",
+      "volume_class": "high"
+    },
+    "corman-s": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0208,
+          "FPR_flagged": 0.0417
+        },
+        "0.05": {
+          "FPR_alert": 0.0208,
+          "FPR_flagged": 0.0417
+        },
+        "0.1": {
+          "FPR_alert": 0.0208,
+          "FPR_flagged": 0.0417
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "corman-s",
+      "volume_class": "high"
+    },
+    "guzman-m": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0208,
+          "FPR_flagged": 0.0208
+        },
+        "0.1": {
+          "FPR_alert": 0.0417,
+          "FPR_flagged": 0.0417
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "guzman-m",
+      "volume_class": "high"
+    },
+    "hain-m": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0417,
+          "FPR_flagged": 0.0417
+        },
+        "0.05": {
+          "FPR_alert": 0.0625,
+          "FPR_flagged": 0.0625
+        },
+        "0.1": {
+          "FPR_alert": 0.125,
+          "FPR_flagged": 0.125
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "hain-m",
+      "volume_class": "high"
+    },
+    "heard-m": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "heard-m",
+      "volume_class": "high"
+    },
+    "keiser-k": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0417,
+          "FPR_flagged": 0.0417
+        },
+        "0.05": {
+          "FPR_alert": 0.0417,
+          "FPR_flagged": 0.0417
+        },
+        "0.1": {
+          "FPR_alert": 0.0417,
+          "FPR_flagged": 0.0417
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "keiser-k",
+      "volume_class": "high"
+    },
+    "lay-k": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "lay-k",
+      "volume_class": "high"
+    },
+    "may-l": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.125,
+          "FPR_flagged": 0.125
+        }
+      },
+      "holdout_count": 8,
+      "n_train": 17,
+      "sender_id": "may-l",
+      "volume_class": "low"
+    },
+    "neal-s": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0417,
+          "FPR_flagged": 0.0417
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "neal-s",
+      "volume_class": "high"
+    },
+    "presto-k": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0208,
+          "FPR_flagged": 0.0208
+        },
+        "0.05": {
+          "FPR_alert": 0.0208,
+          "FPR_flagged": 0.0208
+        },
+        "0.1": {
+          "FPR_alert": 0.1042,
+          "FPR_flagged": 0.1042
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "presto-k",
+      "volume_class": "high"
+    },
+    "quigley-d": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 6,
+      "n_train": 14,
+      "sender_id": "quigley-d",
+      "volume_class": "low"
+    },
+    "ring-r": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 9,
+      "n_train": 21,
+      "sender_id": "ring-r",
+      "volume_class": "low"
+    },
+    "scholtes-d": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0667
+        },
+        "0.05": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        },
+        "0.1": {
+          "FPR_alert": 0.0,
+          "FPR_flagged": 0.0
+        }
+      },
+      "holdout_count": 15,
+      "n_train": 35,
+      "sender_id": "scholtes-d",
+      "volume_class": "low"
+    }
+  },
+  "recall_by_tier": {
+    "generic": {
+      "recall_alert_only": 0.74,
+      "recall_flagged": 0.74,
+      "total": 100
+    },
+    "relabel": {
+      "recall_alert_only": 0.01,
+      "recall_flagged": 0.01,
+      "total": 100
+    },
+    "short_evasion": {
+      "recall_alert_only": 0.0,
+      "recall_flagged": 1.0,
+      "total": 20
+    },
+    "styled_all": {
+      "recall_alert_only": 0.0,
+      "recall_flagged": 0.82,
+      "total": 50
+    },
+    "styled_excluding_copy_based": {
+      "recall_alert_only": 0.0,
+      "recall_flagged": 0.8478,
+      "total": 46
+    }
+  },
+  "routing_layer_cost": {
+    "genuine_holdout_escalation_rate": 0.0019,
+    "holdout_fpr_by_length_bucket": {
+      "40_to_60_words": {
+        "FPR_flagged": 0.0319,
+        "flagged": 3,
+        "total": 94
+      },
+      "60_plus_words": {
+        "FPR_flagged": 0.0262,
+        "flagged": 6,
+        "total": 229
+      }
+    },
+    "split_by_triage_reason": {
+      "insufficient_history": {
+        "escalated": 0,
+        "escalation_rate": 0.0,
+        "total_messages": 11
+      },
+      "too_short": {
+        "escalated": 1,
+        "escalation_rate": 0.0047,
+        "total_messages": 211
+      }
+    },
+    "total_holdout_emails": 525
+  },
+  "worst_sender": {
+    "highlight": "Highest individual FPR_alert rate; pooled averages conceal per-sender variance",
+    "metrics": {
+      "alphas": {
+        "0.02": {
+          "FPR_alert": 0.0417,
+          "FPR_flagged": 0.0417
+        },
+        "0.05": {
+          "FPR_alert": 0.0625,
+          "FPR_flagged": 0.0625
+        },
+        "0.1": {
+          "FPR_alert": 0.125,
+          "FPR_flagged": 0.125
+        }
+      },
+      "holdout_count": 48,
+      "n_train": 112,
+      "sender_id": "hain-m",
+      "volume_class": "high"
+    },
+    "sender_id": "hain-m"
+  }
+}

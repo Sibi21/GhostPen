@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-09-07T12:36:30.930732+00:00",
+  "description": "GhostPen 15 Enron senders (10 high-volume, 5 low-volume) + Marcus Hale CFO alias",
+  "senders": [
+    {
+      "sender_id": "presto-k",
+      "display_name": "Kevin Presto (VP Trading)",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": "Marcus Hale, CFO",
+      "demo_persona": true,
+      "file": "data/prepared/presto-k.jsonl"
+    },
+    {
+      "sender_id": "blair-l",
+      "display_name": "Lynn Blair",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/blair-l.jsonl"
+    },
+    {
+      "sender_id": "corman-s",
+      "display_name": "Shelley Corman",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/corman-s.jsonl"
+    },
+    {
+      "sender_id": "cash-m",
+      "display_name": "Michelle Cash",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/cash-m.jsonl"
+    },
+    {
+      "sender_id": "hain-m",
+      "display_name": "Mary Hain",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/hain-m.jsonl"
+    },
+    {
+      "sender_id": "guzman-m",
+      "display_name": "Mark Guzman",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/guzman-m.jsonl"
+    },
+    {
+      "sender_id": "keiser-k",
+      "display_name": "Kam Keiser",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/keiser-k.jsonl"
+    },
+    {
+      "sender_id": "lay-k",
+      "display_name": "Kenneth Lay",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/lay-k.jsonl"
+    },
+    {
+      "sender_id": "neal-s",
+      "display_name": "Scott Neal",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/neal-s.jsonl"
+    },
+    {
+      "sender_id": "heard-m",
+      "display_name": "Marie Heard",
+      "volume_class": "high",
+      "total_emails": 160,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/heard-m.jsonl"
+    },
+    {
+      "sender_id": "scholtes-d",
+      "display_name": "Diana Scholtes",
+      "volume_class": "low",
+      "total_emails": 50,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/scholtes-d.jsonl"
+    },
+    {
+      "sender_id": "ring-r",
+      "display_name": "Richard Ring",
+      "volume_class": "low",
+      "total_emails": 30,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/ring-r.jsonl"
+    },
+    {
+      "sender_id": "may-l",
+      "display_name": "Larry May",
+      "volume_class": "low",
+      "total_emails": 25,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/may-l.jsonl"
+    },
+    {
+      "sender_id": "badeer-r",
+      "display_name": "Robert Badeer",
+      "volume_class": "low",
+      "total_emails": 22,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/badeer-r.jsonl"
+    },
+    {
+      "sender_id": "quigley-d",
+      "display_name": "Dutch Quigley",
+      "volume_class": "low",
+      "total_emails": 20,
+      "alias": null,
+      "demo_persona": false,
+      "file": "data/prepared/quigley-d.jsonl"
+    }
+  ]
+}
