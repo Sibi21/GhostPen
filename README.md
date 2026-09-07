@@ -70,7 +70,7 @@ BEC attacks bypass technical filters (SPF/DKIM/DMARC) because attackers compromi
 ## 3. Expected Output
 
 ### Sample Verdicts
-When running `make demo` or `make demo-cli`, judges will observe all four verdict classes across the Marcus Hale (CFO) inbox:
+When running `make demo` or `make demo-cli`, you will observe all four verdict classes across the Marcus Hale (CFO) inbox:
 
 ```json
 /* 1. Genuine Email (Typical holdout message) */
