@@ -22,12 +22,11 @@ if REPO_ROOT not in sys.path:
 import pandas as pd
 import streamlit as st
 
+from src.demo_inbox import build_inbox
 from src.features import extract_features
 from src.ingest import get_all_senders, resolve_sender_id
 from src.profile import load_null, load_profile
 from src.score import score_message
-
-INBOX_FILE = os.path.join(REPO_ROOT, "app", "demo_inbox.json")
 
 # Streamlit Page Config
 st.set_page_config(
@@ -95,12 +94,6 @@ st.markdown(
 )
 
 
-@st.cache_data
-def load_inbox_messages():
-    if not os.path.exists(INBOX_FILE):
-        return []
-    with open(INBOX_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 
 def main():
@@ -133,6 +126,12 @@ def main():
         help="Controls the statistical confidence threshold. Cranking to 0.02 enforces stricter evidence requirements.",
     )
 
+    reveal_truth = st.sidebar.checkbox(
+        "Reveal ground truth (demo only)",
+        value=False,
+        help="Shows authorial ground-truth tier per message for demonstration evaluation.",
+    )
+
     # Load Active Profile Metadata
     active_profile = load_profile(active_sender_id)
     active_null = load_null(active_sender_id)
@@ -156,7 +155,7 @@ def main():
     # -------------------------------------------------------------
     # Load Inbox & Score Messages
     # -------------------------------------------------------------
-    raw_messages = load_inbox_messages()
+    raw_messages = build_inbox(active_sender_id)
     if not raw_messages:
         st.error("Demo inbox data not found. Please run scripts or forge.")
         return
@@ -189,29 +188,46 @@ def main():
     col_list, col_detail = st.columns([5, 7])
 
     with col_list:
-        st.subheader("Executive Mailbox")
+        display_name = getattr(raw_messages, "display_name", selected_label)
+        name_clean = display_name.split(" (")[0]
+        st.subheader(f"Incoming mail claiming to be {display_name}")
+        st.caption(f"These messages arrived with {name_clean}'s name on the From line. GhostPen checks whether the writing actually matches their enrolled history.")
+
+        if getattr(raw_messages, "genuine_only", False):
+            st.warning("Low-volume sender: no forged demo messages authored; see evaluation stress table. Expect TRIAGE (insufficient history) at strict alpha here — this reflects the enrollment floor working as designed.")
+        elif not getattr(raw_messages, "has_short_genuine", True):
+            st.info("Note: No genuine holdout messages under 40 words exist for this sender; short genuine slot omitted (13 messages total).")
 
         # Create interactive selection radio
         options = []
         for m in scored_inbox:
             v = m["res"]["verdict"]
             esc_tag = " [ESCALATED] " if m["res"]["content_escalation"] else ""
-            options.append(f"{m['id']} | [{v}]{esc_tag} | {m['subject'][:35]}...")
+            tier_tag = f" | [{m['category']}]" if reveal_truth else ""
+            options.append(f"{m['id']} | [{v}]{esc_tag}{tier_tag} | {m['subject'][:30]}...")
 
-        selected_idx = st.selectbox("Select email to audit:", range(len(options)), format_func=lambda i: options[i])
+        selected_idx = st.selectbox(
+            "Select email to audit:",
+            range(len(options)),
+            format_func=lambda i: options[i],
+            key=f"audit_select_{active_sender_id}",
+        )
         selected_item = scored_inbox[selected_idx]
 
         # Display table of inbox overview
         overview_data = []
         for m in scored_inbox:
-            overview_data.append({
+            row = {
                 "ID": m["id"],
                 "Date": m["date"],
                 "Subject": m["subject"],
                 "Verdict": m["res"]["verdict"],
                 "Score S": f"{m['res']['deviation_score']:.3f}",
                 "Escalated": "YES" if m["res"]["content_escalation"] else "-",
-            })
+            }
+            if reveal_truth:
+                row["Ground Truth Tier"] = m["category"]
+            overview_data.append(row)
         st.dataframe(pd.DataFrame(overview_data), hide_index=True, use_container_width=True)
 
     # -------------------------------------------------------------
@@ -219,6 +235,8 @@ def main():
     # -------------------------------------------------------------
     with col_detail:
         st.subheader(f"Audit Inspection: {selected_item['id']}")
+        if reveal_truth:
+            st.info(f"**Ground Truth Tier (Demo Mode):** `{selected_item['category']}`")
         res = selected_item["res"]
         verdict = res["verdict"]
 

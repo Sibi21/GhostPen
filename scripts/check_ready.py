@@ -1,4 +1,4 @@
-﻿"""
+"""
 scripts/check_ready.py
 ----------------------
 Pre-flight readiness verification for GhostPen.
@@ -52,7 +52,7 @@ def check_dependencies():
 def check_project_files():
     required_paths = [
         os.path.join(REPO_ROOT, "app", "app.py"),
-        os.path.join(REPO_ROOT, "app", "demo_inbox.json"),
+        os.path.join(REPO_ROOT, "data", "demo_inbox.json"),
         os.path.join(REPO_ROOT, "src", "features.py"),
         os.path.join(REPO_ROOT, "src", "profile.py"),
         os.path.join(REPO_ROOT, "src", "score.py"),

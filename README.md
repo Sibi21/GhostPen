@@ -121,7 +121,9 @@ BEC attacks bypass technical filters (SPF/DKIM/DMARC) because attackers compromi
 ## 3. Expected Output
 
 ### Sample Verdicts
-When running `make demo` or `make demo-cli`, you will observe all four verdict classes across the Marcus Hale (CFO) inbox:
+In the demonstration dashboard (`make demo` or `START_GHOSTPEN.bat`), each executive profile features its own contextual mailbox: **"Incoming mail claiming to be {display name}"**. Switching the active executive profile in the sidebar dynamically switches to that sender's curated inbox.
+
+Across the canonical Marcus Hale (CFO) demo inbox (also runnable directly via `make demo-cli`), you will observe all four verdict classes:
 
 ```json
 /* 1. Genuine Email (Typical holdout message) */
