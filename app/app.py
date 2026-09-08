@@ -101,6 +101,91 @@ st.markdown(
         border-radius: 0 6px 6px 0;
         font-size: 0.93em;
     }
+    /* P5: Mailbox table styling & column-menu suppression */
+    .mailbox-table-container {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid rgba(226, 232, 240, 0.4);
+        background: transparent;
+        margin-top: 12px;
+        margin-bottom: 16px;
+    }
+    .mailbox-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+        text-align: left;
+    }
+    .mailbox-table th {
+        background-color: rgba(247, 250, 252, 0.08);
+        font-weight: 700;
+        padding: 9px 8px;
+        border-bottom: 2px solid rgba(226, 232, 240, 0.3);
+        white-space: nowrap;
+        user-select: none;
+    }
+    .mailbox-table td {
+        padding: 8px 8px;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.15);
+        vertical-align: middle;
+    }
+    .mailbox-row {
+        transition: background-color 0.15s ease;
+    }
+    .mailbox-row:hover {
+        background-color: rgba(49, 130, 206, 0.08);
+    }
+    .mailbox-row.selected-row {
+        background-color: rgba(49, 130, 206, 0.18) !important;
+        border-left: 4px solid #3182ce !important;
+        font-weight: 600;
+    }
+    .badge {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+    .badge-ok {
+        background-color: rgba(46, 160, 67, 0.2);
+        color: #3fb950;
+        border: 1px solid rgba(46, 160, 67, 0.4);
+    }
+    .badge-alert {
+        background-color: rgba(207, 34, 46, 0.2);
+        color: #ff7b72;
+        border: 1px solid rgba(207, 34, 46, 0.4);
+    }
+    .badge-triage {
+        background-color: rgba(210, 153, 34, 0.2);
+        color: #e3b341;
+        border: 1px solid rgba(210, 153, 34, 0.4);
+    }
+    .badge-esc {
+        background-color: rgba(207, 34, 46, 0.25);
+        color: #ff7b72;
+        font-weight: 800;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+    .badge-tier {
+        background-color: rgba(113, 128, 150, 0.2);
+        color: #a0aec0;
+        font-family: monospace;
+        font-size: 0.72rem;
+    }
+    /* Safety rule: ensure no column menu or statistics popovers ever render */
+    div[data-testid="stDataFrameColumnMenu"],
+    div[data-testid="stDataFrameColumnMenuTarget"],
+    .stDataFrameStatisticsMenu,
+    div[data-testid="stDataFrameStatisticsChart"] {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -210,7 +295,7 @@ def main():
         st.sidebar.info(
             f"**Enrolled History:** {active_profile['n_train']} emails\n\n"
             f"**Minimum achievable p-value ($p_{{\\min}}$):** `{active_null['p_min']:.4f}`\n\n"
-            f"**Operating Enrollment Floor:** $\ge {int(1.0/alpha)}$ emails"
+            f"**Operating Enrollment Floor:** $\\ge {int(1.0/alpha)}$ emails"
         )
     else:
         st.sidebar.warning("Selected profile is unenrolled.")
@@ -256,7 +341,7 @@ def main():
     # -------------------------------------------------------------
     # Two-Column Layout: Message List vs Message Inspection
     # -------------------------------------------------------------
-    col_list, col_detail = st.columns([5, 7])
+    col_list, col_detail = st.columns([5.3, 6.7])
 
     with col_list:
         display_name = getattr(raw_messages, "display_name", selected_label)
@@ -285,21 +370,96 @@ def main():
         )
         selected_item = scored_inbox[selected_idx]
 
-        # Display table of inbox overview
-        overview_data = []
-        for m in scored_inbox:
-            row = {
-                "ID": m["id"],
-                "Date": m["date"],
-                "Subject": m["subject"],
-                "Verdict": m["res"]["verdict"],
-                "Score S": f"{m['res']['deviation_score']:.3f}",
-                "Escalated": "YES" if m["res"]["content_escalation"] else "-",
-            }
+        # Plain display table (no column menu, no statistics bug)
+        table_html = [
+            '<div class="mailbox-table-container">',
+            '<table class="mailbox-table">',
+            '<thead><tr>',
+            '<th>ID</th>',
+            '<th>Date</th>',
+            '<th>Subject</th>',
+            '<th>Verdict</th>',
+            '<th>Score S</th>',
+            '<th>Escalated</th>',
+        ]
+        if reveal_truth:
+            table_html.append('<th>Ground Truth Tier</th>')
+        table_html.append('</tr></thead><tbody>')
+
+        for idx, m in enumerate(scored_inbox):
+            is_selected = (idx == selected_idx)
+            row_class = "mailbox-row selected-row" if is_selected else "mailbox-row"
+            v = m["res"]["verdict"]
+            v_class = f"badge-{v.lower()}"
+            esc = '<span class="badge badge-esc">YES</span>' if m["res"]["content_escalation"] else '<span style="opacity: 0.5;">-</span>'
+            s_score = f"{m['res']['deviation_score']:.3f}"
+            subj = m["subject"]
+            if len(subj) > 36:
+                subj = subj[:36] + "..."
+
+            active_pill = ' <span style="color:#3182ce; font-size:0.68rem; font-weight:700;">[SELECTED]</span>' if is_selected else ''
+
+            row_html = [
+                f'<tr class="{row_class}" data-idx="{idx}">',
+                f'<td class="cell-id"><b>{m["id"]}</b>{active_pill}</td>',
+                f'<td class="cell-date">{m["date"]}</td>',
+                f'<td class="cell-subject" title="{m["subject"]}">{subj}</td>',
+                f'<td class="cell-verdict"><span class="badge {v_class}">{v}</span></td>',
+                f'<td class="cell-score"><code>{s_score}</code></td>',
+                f'<td class="cell-esc">{esc}</td>',
+            ]
             if reveal_truth:
-                row["Ground Truth Tier"] = m["category"]
-            overview_data.append(row)
-        st.dataframe(pd.DataFrame(overview_data), hide_index=True, use_container_width=True)
+                tier = m.get("category", "-")
+                row_html.append(f'<td class="cell-tier"><span class="badge badge-tier">{tier}</span></td>')
+            row_html.append('</tr>')
+            table_html.extend(row_html)
+
+        table_html.append('</tbody></table></div>')
+
+        # Add JavaScript to sync row click with audit selectbox
+        row_click_js = """
+        <script>
+        (function() {
+            function bindMailboxRows() {
+                const rows = document.querySelectorAll('.mailbox-row');
+                rows.forEach(row => {
+                    if (row.dataset.bound) return;
+                    row.dataset.bound = 'true';
+                    row.style.cursor = 'pointer';
+                    row.addEventListener('click', function() {
+                        const targetIdx = parseInt(this.getAttribute('data-idx'));
+                        const selectboxes = document.querySelectorAll('div[data-testid="stSelectbox"]');
+                        let auditBox = null;
+                        selectboxes.forEach(sb => {
+                            if (sb.innerText.includes('Select email to audit:')) {
+                                auditBox = sb;
+                            }
+                        });
+                        if (!auditBox && selectboxes.length > 1) {
+                            auditBox = selectboxes[selectboxes.length - 1];
+                        }
+                        if (auditBox) {
+                            const trigger = auditBox.querySelector('div[role="combobox"], input, div[aria-haspopup="listbox"]');
+                            if (trigger) {
+                                trigger.click();
+                                setTimeout(() => {
+                                    const options = document.querySelectorAll('li[role="option"], div[role="option"]');
+                                    if (options && options[targetIdx]) {
+                                        options[targetIdx].click();
+                                    }
+                                }, 30);
+                            }
+                        }
+                    });
+                });
+            }
+            bindMailboxRows();
+            const observer = new MutationObserver(bindMailboxRows);
+            observer.observe(document.body, { childList: true, subtree: true });
+        })();
+        </script>
+        """
+        st.markdown("\n".join(table_html) + row_click_js, unsafe_allow_html=True)
 
     # -------------------------------------------------------------
     # Message Detail Inspector
