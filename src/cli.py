@@ -13,6 +13,7 @@ import json
 import sys
 from typing import Optional
 
+from src.attribution import compute_attribution
 from src.score import score_message
 
 
@@ -82,6 +83,15 @@ def run_cli():
     result = score_message(text, args.sender, alpha=args.alpha)
     print(json.dumps(result, indent=2))
 
+    att = compute_attribution(text, args.sender, alpha=args.alpha)
+    print("\nClosest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict):")
+    if att["is_no_match"]:
+        print("  No enrolled author's style matches this message.")
+    else:
+        for idx, m in enumerate(att["top_3"]):
+            print(f"  #{idx + 1}: {m['display_name']} (p={m['p']:.4f})")
+    print(f"  Claimed sender ({att['claimed_sender']['display_name']}): p={att['claimed_sender']['p']:.4f}")
+
 
 def run_demo_cli(alpha: float = 0.05):
     """Demonstrates scoring across genuine, forged, and short-evasion scenarios."""
@@ -141,6 +151,15 @@ Best regards!""",
             print(f"  Context Flags:      {flags}")
         if escalate:
             print(f"  [!] ESCALATION:     {res['escalation_hint']}")
+
+        att = compute_attribution(text, "Marcus Hale", alpha=alpha)
+        print("  Attribution (Closest enrolled authors):")
+        if att["is_no_match"]:
+            print("    No enrolled author's style matches this message.")
+        else:
+            for idx, m in enumerate(att["top_3"]):
+                print(f"    #{idx + 1}: {m['display_name']} (p={m['p']:.4f})")
+        print(f"    Claimed ({att['claimed_sender']['display_name']}): p={att['claimed_sender']['p']:.4f}")
 
 
 if __name__ == "__main__":

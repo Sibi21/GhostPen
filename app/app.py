@@ -22,6 +22,11 @@ if REPO_ROOT not in sys.path:
 import pandas as pd
 import streamlit as st
 
+from src.attribution import (
+    compute_attribution,
+    extract_matched_habits,
+    get_alpha_price_tag,
+)
 from src.demo_inbox import build_inbox
 from src.features import extract_features
 from src.ingest import get_all_senders, resolve_sender_id
@@ -88,6 +93,14 @@ st.markdown(
         border-radius: 0 6px 6px 0;
         font-size: 0.95em;
     }
+    .matched-habit-pill {
+        background-color: rgba(46, 160, 67, 0.10);
+        border-left: 4px solid #2ea043;
+        padding: 8px 12px;
+        margin: 6px 0;
+        border-radius: 0 6px 6px 0;
+        font-size: 0.93em;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -125,6 +138,8 @@ def main():
         value=0.05,
         help="Controls the statistical confidence threshold. Cranking to 0.02 enforces stricter evidence requirements.",
     )
+    price_tag = get_alpha_price_tag(alpha)
+    st.sidebar.caption(f"💰 **Operational Cost:** {price_tag['display_text']}")
 
     reveal_truth = st.sidebar.checkbox(
         "Reveal ground truth (demo only)",
@@ -287,6 +302,41 @@ def main():
                 st.markdown(f'<div class="broken-habit-pill">• {bh}</div>', unsafe_allow_html=True)
         else:
             st.success("All observed writing habits match the enrolled executive baseline.")
+
+        # A2: What the disguise got right (Matched Habits)
+        if verdict in ("ALERT", "TRIAGE"):
+            matched_cards = extract_matched_habits(selected_item["body"], active_sender_id)
+            if matched_cards:
+                st.markdown("##### What the disguise got right")
+                for mc in matched_cards:
+                    tt = mc["tooltip"]
+                    title = mc["title"]
+                    detail = mc["detail"]
+                    st.markdown(
+                        f'<div class="matched-habit-pill" title="{tt}">✔ <b>{title}</b> — <small>{detail}</small></div>',
+                        unsafe_allow_html=True,
+                    )
+
+        # A1: Attribution Panel — "Who actually wrote this?"
+        st.markdown("#### Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict)")
+        att = compute_attribution(selected_item["body"], active_sender_id, alpha=alpha)
+        if att["is_no_match"]:
+            st.warning("No enrolled author's style matches this message.")
+            st.caption(f"Claimed sender ({att['claimed_sender']['display_name']}): p = {att['claimed_sender']['p']:.4f}")
+        else:
+            cols = st.columns(len(att["top_3"]))
+            for idx, m in enumerate(att["top_3"]):
+                with cols[idx]:
+                    st.metric(
+                        f"#{idx + 1} Match",
+                        m["display_name"],
+                        f"p = {m['p']:.4f}",
+                        help=f"Deviation score S = {m['deviation_score']:.4f}",
+                    )
+            st.caption(
+                f"**Claimed sender contrast:** {att['claimed_sender']['display_name']} "
+                f"(p = `{att['claimed_sender']['p']:.4f}`, rank #{att['claimed_rank']})"
+            )
 
         # 5. Directional Shift
         if res["direction"] != "Style variation within normal baseline":

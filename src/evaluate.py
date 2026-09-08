@@ -35,6 +35,7 @@ from src.features import extract_features
 from src.ingest import get_all_senders, resolve_sender_id, split_sender_data
 from src.profile import load_profile
 from src.score import score_message
+from src.attribution import compute_attribution
 
 ARTIFACTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "artifacts")
 PLOTS_DIR = os.path.join(ARTIFACTS_DIR, "plots")
@@ -193,6 +194,17 @@ def evaluate_system():
 
     styled_copy_audit_records = []
 
+    # Ground-truth mapping for relabel true authors
+    sender_bodies = {}
+    for s in all_senders:
+        _, holdout = split_sender_data(s["sender_id"])
+        for e in holdout:
+            sender_bodies[e["body"]] = s["sender_id"]
+
+    relabel_top1_count = 0
+    generic_no_match_count = 0
+    styled_no_match_count = 0
+
     for f_rec in forged_records:
         sid = f_rec["sender"]
         tier = f_rec["tier"]
@@ -209,6 +221,12 @@ def evaluate_system():
             if is_flagged:
                 forged_eval["relabel"]["flagged"] += 1
 
+            # A1 Attribution check
+            att = compute_attribution(text, sid, alpha=0.05)
+            true_author = sender_bodies.get(text)
+            if not att["is_no_match"] and att["top_3"] and att["top_3"][0]["sender_id"] == true_author:
+                relabel_top1_count += 1
+
         elif tier == "generic":
             forged_eval["generic"]["total"] += 1
             if is_alert:
@@ -216,12 +234,22 @@ def evaluate_system():
             if is_flagged:
                 forged_eval["generic"]["flagged"] += 1
 
+            # A1 Attribution check
+            att = compute_attribution(text, sid, alpha=0.05)
+            if att["is_no_match"]:
+                generic_no_match_count += 1
+
         elif tier == "styled":
             forged_eval["styled_all"]["total"] += 1
             if is_alert:
                 forged_eval["styled_all"]["alert"] += 1
             if is_flagged:
                 forged_eval["styled_all"]["flagged"] += 1
+
+            # A1 Attribution check
+            att = compute_attribution(text, sid, alpha=0.05)
+            if att["is_no_match"]:
+                styled_no_match_count += 1
 
             is_copy = f_rec.get("copy_based", False)
             styled_copy_audit_records.append({
@@ -449,6 +477,9 @@ def evaluate_system():
     )
 
     metrics_payload = {
+        "attribution_no_match_rate_generic": safe_rate(generic_no_match_count, forged_eval["generic"]["total"]),
+        "attribution_no_match_rate_styled": safe_rate(styled_no_match_count, forged_eval["styled_all"]["total"]),
+        "attribution_top1_accuracy_relabel": safe_rate(relabel_top1_count, forged_eval["relabel"]["total"]),
         "detection_definition": DETECTION_DEFINITION_VERBATIM,
         "claim_discipline": CLAIM_DISCIPLINE_VERBATIM,
         "evaluation_summary": {

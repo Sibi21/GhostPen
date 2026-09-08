@@ -1,4 +1,7 @@
 {
+  "attribution_no_match_rate_generic": 0.1,
+  "attribution_no_match_rate_styled": 0.0,
+  "attribution_top1_accuracy_relabel": 0.03,
   "baseline_comparison_table": [
     {
       "FPR_alert_holdout": 0.0152,

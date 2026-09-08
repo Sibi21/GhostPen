@@ -184,6 +184,49 @@ Across the canonical Marcus Hale (CFO) demo inbox (also runnable directly via `m
 }
 ```
 
+### Attribution Panel ("Who actually wrote this?")
+In both the Web dashboard and CLI, scored messages feature cross-profile stylometric attribution across enrolled senders (ranking by $p$-value descending, tie-breaking by `sender_id` ascending). The panel covers three distinct operational states:
+
+1. **Claimed Sender Matches (Genuine holdout email)**:
+   ```text
+   Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict):
+     #1 Match: Kevin Presto (VP Trading) (p = 0.9558)
+     #2 Match: Shelley Corman (p = 0.9558)
+     #3 Match: Kam Keiser (p = 0.9558)
+     Claimed sender contrast: Kevin Presto (VP Trading) (p = 0.9558, rank #1)
+   ```
+
+2. **Another Enrolled Sender Matches (Relabel impersonation attack)**:
+   ```text
+   Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict):
+     #1 Match: Lynn Blair (p = 0.6637)
+     #2 Match: Diana Scholtes (p = 0.5278)
+     #3 Match: Kam Keiser (p = 0.4336)
+     Claimed sender contrast: Kevin Presto (VP Trading) (p = 0.1947, rank #6)
+   ```
+   *The true author Lynn Blair ranks #1 with $p \ge 0.05$, exposing that the email was actually authored by someone else in the company.*
+
+3. **No Enrolled Match (Generic / Styled LLM BEC attack)**:
+   ```text
+   Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict):
+     No enrolled author's style matches this message.
+     Claimed sender (Kevin Presto (VP Trading)): p = 0.0177
+   ```
+   *When all calibrated authors have $p < \alpha$, nobody is named. This no-match state is itself a vital BEC indicator: the email reads like nobody in the company.*
+
+### "What the disguise got right" (Matched Habits)
+For any message evaluated as `ALERT` or `TRIAGE`, GhostPen inspects which habits the attacker successfully imitated. Numeric features with $|z| \le 1.0$ relative to the sender's profile are rendered as green cards:
+- `attacker matched: signs 'thanks'`
+- `attacker matched: average sentence length normal (z = +0.21)`
+- `attacker matched: contraction rate normal (z = -0.14)`
+- Tooltip threshold: *"matched = within 1 of his own standard deviations"*
+
+### Alpha-Slider Price Tag (Operational SOC Cost)
+Beside the interactive operating $\alpha$ slider, an operational cost indicator displays real-world SOC triage workload measured directly on genuine holdout emails from `metrics.json`:
+- At $\alpha = 0.02$: `expect ~1.52 flags per 100 genuine emails (measured on holdout)`
+- At $\alpha = 0.05$: `expect ~1.71 flags per 100 genuine emails (measured on holdout)`
+- At $\alpha = 0.10$: `expect ~3.81 flags per 100 genuine emails (measured on holdout)`
+
 ---
 
 ## 4. How Scoring Works
