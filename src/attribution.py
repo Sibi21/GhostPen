@@ -216,9 +216,9 @@ def get_alpha_price_tag(alpha: float, metrics_file: str = METRICS_FILE) -> Dict:
         except Exception:
             pass
 
-    y_flags = round(100.0 * fpr_flagged, 2)
+    y_flags = round(100.0 * fpr_flagged, 1)
     display_text = (
-        f"at alpha = {alpha:.2f}: expect ~{y_flags:.2f} flags per 100 genuine emails (measured on holdout)"
+        f"Operational Cost: at alpha = {alpha:.2f}: expect ~{y_flags:.1f} flags per 100 genuine emails (pooled across enrolled senders, measured on holdout)"
     )
 
     return {

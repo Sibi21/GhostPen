@@ -130,7 +130,7 @@ class TestPatchP2Innovation(unittest.TestCase):
 
     def test_e_alpha_price_tag_matches_metrics(self):
         """
-        Test (e): displayed Y equals 100 * FPR_flagged at that grid alpha.
+        Test (e): displayed Y equals round(100 * FPR_flagged_pooled at grid alpha, 1).
         """
         self.assertTrue(os.path.exists(METRICS_FILE), "metrics.json must exist")
         with open(METRICS_FILE, "r", encoding="utf-8") as f:
@@ -140,11 +140,13 @@ class TestPatchP2Innovation(unittest.TestCase):
         for a in grid_alphas:
             tag = get_alpha_price_tag(a)
             expected_fpr = metrics["fpr_variants"][str(a)]["FPR_flagged"]
-            expected_y = round(100.0 * expected_fpr, 2)
+            expected_y = round(100.0 * expected_fpr, 1)
 
             self.assertEqual(tag["flags_per_100"], expected_y)
-            self.assertIn(f"{expected_y:.2f}", tag["display_text"])
-            self.assertIn(f"alpha = {a:.2f}", tag["display_text"])
+            self.assertIn(f"expect ~{expected_y:.1f} flags", tag["display_text"])
+            self.assertIn("Operational Cost:", tag["display_text"])
+            self.assertIn(f"at alpha = {a:.2f}:", tag["display_text"])
+            self.assertIn("pooled across enrolled senders, measured on holdout", tag["display_text"])
 
     def test_f_matched_habits_within_one_sigma(self):
         """

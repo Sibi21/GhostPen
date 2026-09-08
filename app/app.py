@@ -124,22 +124,78 @@ def main():
     sender_options = {
         "Marcus Hale (CFO)": "Marcus Hale",
     }
+    option_tooltips = {
+        "Marcus Hale (CFO)": "Marcus Hale: 112 enrolled emails (high)",
+    }
     for s in senders_list:
         if s["sender_id"] != "presto-k":
             dname = f"{s['display_name']} ({s['volume_class'].upper()})"
             sender_options[dname] = s["sender_id"]
+            prof = load_profile(s["sender_id"])
+            n_tr = prof["n_train"] if prof else s.get("total_emails", 0)
+            option_tooltips[dname] = f"{s['display_name']}: {n_tr} enrolled emails ({s['volume_class']})"
 
-    selected_label = st.sidebar.selectbox("Active Executive Profile", list(sender_options.keys()), index=0)
+    selected_label = st.sidebar.selectbox(
+        "Active Executive Profile",
+        list(sender_options.keys()),
+        index=0,
+        help="Select an executive profile. Hover over options or see legend below for volume class and training history.",
+    )
     active_sender_id = sender_options[selected_label]
+    active_tooltip = option_tooltips.get(selected_label, "")
+
+    # C1: Dropdown legend directly under the dropdown
+    st.sidebar.caption("HIGH = high-volume sender (>= 120 enrolled emails) - LOW = low-volume (20-60) - expect TRIAGE at strict alpha from the enrollment floor.")
+    st.sidebar.markdown(f"<div style='margin-top:-6px;margin-bottom:10px;'><small><b>Selected Profile:</b> <span title='{active_tooltip}'>{active_tooltip}</span></small></div>", unsafe_allow_html=True)
+
+    # C1: Inject client-side option hover tooltips
+    st.markdown(
+        f"""
+        <script>
+        const optionTooltips = {json.dumps(option_tooltips)};
+        const observer = new MutationObserver(() => {{
+            const options = parent.document.querySelectorAll('li[role="option"], div[role="option"]');
+            options.forEach(opt => {{
+                const txt = opt.innerText ? opt.innerText.trim() : "";
+                if (optionTooltips[txt]) {{
+                    opt.setAttribute('title', optionTooltips[txt]);
+                }}
+            }});
+        }});
+        observer.observe(parent.document.body, {{ childList: true, subtree: true }});
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # C2: 3-point alpha dial with visible ticks, caption, and tooltip
+    dial_caption_text = (
+        "Three calibrated operating points. Each displays its measured holdout "
+        "false-alarm price; intermediate settings are not offered because we do "
+        "not display unmeasured rates."
+    )
 
     alpha = st.sidebar.select_slider(
         "Operating Alpha Dial (FPR Target)",
         options=[0.02, 0.05, 0.10],
         value=0.05,
-        help="Controls the statistical confidence threshold. Cranking to 0.02 enforces stricter evidence requirements.",
+        format_func=lambda x: f"{x:.2f}",
+        help=dial_caption_text,
     )
+
+    # Visible tick labels at all three positions (0.02, 0.05, 0.10)
+    col_t1, col_t2, col_t3 = st.sidebar.columns([1, 1, 1])
+    col_t1.markdown("<small style='opacity:0.8;'><b>0.02</b><br>(strict)</small>", unsafe_allow_html=True)
+    col_t2.markdown("<small style='opacity:0.8;text-align:center;display:block;'><b>0.05</b><br>(standard)</small>", unsafe_allow_html=True)
+    col_t3.markdown("<small style='opacity:0.8;text-align:right;display:block;'><b>0.10</b><br>(relaxed)</small>", unsafe_allow_html=True)
+
+    st.sidebar.caption(dial_caption_text)
+
+    # C3: Operational cost line cleanup
     price_tag = get_alpha_price_tag(alpha)
-    st.sidebar.caption(f"💰 **Operational Cost:** {price_tag['display_text']}")
+    st.sidebar.markdown(
+        f"**Operational Cost:** at alpha = {alpha:.2f}: expect ~{price_tag['flags_per_100']:.1f} flags per 100 genuine emails (pooled across enrolled senders, measured on holdout)"
+    )
 
     reveal_truth = st.sidebar.checkbox(
         "Reveal ground truth (demo only)",
