@@ -302,15 +302,24 @@ Baseline B (Global Threshold on S)     |   0.048   |  0.050   |   79.0%   |  82.
 - **Conformal Calibration**: Holdout $\text{FPR}_{\text{alert}} = 0.0152 \le 0.05$ at $\alpha=0.05$ (conservative bound satisfied).
 - **Style Drift**: In-sample $\text{FPR} = 0.0082$, holdout $\text{FPR} = 0.0152 \implies$ measured style drift $= +0.0070$.
 - **SOC False Alarms**: Only **1.71 flags per 100 genuine emails**.
+- **Stylometric Abstain & Escalation**: 40.19% share of genuine mail we decline to judge stylometrically (`abstain_rate_genuine_holdout_pooled = 0.4019`), alongside a genuine holdout escalation rate of 0.19% (1 in 525 emails).
 - **Tier C Copy Audit**: 46 of 50 styled impersonations (92.0%) are verified clean style mimics without text copying. Recall is 82.0% across all styled attacks, and 84.8% excluding copy-audited records.
 
 ---
 
 ## 9. Limitations & AI Disclosure
 
+- **Reply-Heavy Senders**: For reply-heavy senders whose mail is predominantly brief, stylometry abstains on a large share of messages (abstain rate per sender in metrics.json); such senders are protected mainly by the routing layer, which is why TRIAGE is never a silent pass.
 - **Style Drift**: People change writing habits over time; rolling 6-month profile update windows are recommended for production.
 - **Low-Volume Senders**: Reliable conformal calibration at $\alpha=0.05$ requires $\ge 20$ training emails.
 - **Character 3-grams**: Topic vocabulary can subtly influence 3-grams; glue function words remain primary.
 - **English-Only**: Glue words and punctuation are tuned for English corporate communication.
 - **AI-Assistance Disclosure**: Code scaffolding and forged corpus generated with an AI agent; design, evaluation, and statistical decisions human-reviewed.
 - **Submission Slides**: The official 5-page PDF presentation is generated via `python scripts/generate_slides.py` and saved to `artifacts/GhostPen_Presentation.pdf`.
+
+---
+
+## 10. Hackathon Defense Drill (Judge Q&A)
+
+**Q: "What share of real mail do you refuse to judge?"**  
+**A:** 40.19% (0.4019 pooled across enrolled senders on holdout), declined mail is routed, not released - and the decline rate is measured per sender, so a buyer knows exactly how much traffic falls to secondary controls.

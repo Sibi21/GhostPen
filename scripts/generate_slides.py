@@ -183,11 +183,20 @@ def slide_5(ax):
         "1. Conformal Guarantee Works: Observed holdout FPR_alert (1.52%) stays strictly below alpha=0.05.\n"
         "2. Superior Threat Coverage: GhostPen catches 74% of generic LLM BEC vs Baseline A's 28% (TF-IDF fails on fluent rewordings).\n"
         "3. SOC Operational Viability: Only 1.71 false alarms per 100 genuine emails; precision reaches 76.6% at 10% attack prevalence.\n"
-        "4. Transparent FP Autopsy: False positives stem from structured artifacts (e.g., semicolon-delimited appointment lists)."
+        "4. Stylometric Abstain vs. Escalation: 40.19% share of genuine mail we decline to judge stylometrically; holdout escalation rate is 0.19%.\n"
+        "5. Transparent FP Autopsy: False positives stem from structured artifacts (e.g., semicolon-delimited appointment lists)."
     )
-    ax.text(0.0, 0.22, t1, fontsize=10, color="#2d3748", linespacing=1.5)
+    ax.text(0.0, 0.20, t1, fontsize=9.5, color="#2d3748", linespacing=1.4)
 
-    ax.text(0.0, 0.08, "Limitations & Roadmap: Style drift requires rolling profile updates; low-volume senders need >=20 emails for alpha=0.05;\nEnglish-only glue words; character 3-grams have slight project-topic sensitivity. Prototype built with AI scaffolding; human-reviewed.", fontsize=8.5, color="#718096", style="italic")
+    ax.text(
+        0.0,
+        0.05,
+        "Limitations & Roadmap: For reply-heavy senders whose mail is predominantly brief, stylometry abstains on a large share of messages\n(abstain rate per sender in metrics.json); such senders are protected mainly by the routing layer, which is why TRIAGE is never a silent pass.\nStyle drift requires rolling updates; low-volume senders need >=20 emails for alpha=0.05. Scaffolding human-reviewed.",
+        fontsize=8.0,
+        color="#718096",
+        style="italic",
+        linespacing=1.3,
+    )
 
 
 def generate_presentation_pdf():

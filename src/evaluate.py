@@ -37,12 +37,15 @@ from src.profile import load_profile
 from src.score import score_message
 from src.attribution import compute_attribution
 
-ARTIFACTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "artifacts")
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ARTIFACTS_DIR = os.path.join(REPO_ROOT, "artifacts")
 PLOTS_DIR = os.path.join(ARTIFACTS_DIR, "plots")
 METRICS_FILE = os.path.join(ARTIFACTS_DIR, "metrics.json")
 AUTOPSY_FILE = os.path.join(ARTIFACTS_DIR, "fp_autopsy.json")
 CALIBRATION_PLOT_FILE = os.path.join(PLOTS_DIR, "calibration.png")
-FORGED_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "forged", "forged.jsonl")
+DATA_DIR = os.path.join(REPO_ROOT, "data")
+FORGED_FILE = os.path.join(DATA_DIR, "forged", "forged.jsonl")
+DEMO_INBOX_FILE = os.path.join(DATA_DIR, "demo_inbox.json")
 
 DETECTION_DEFINITION_VERBATIM = (
     "flagged = ALERT OR (TRIAGE AND content_escalation); caught = flagged."
@@ -58,6 +61,10 @@ CLAIM_DISCIPLINE_VERBATIM = (
 )
 
 ALPHA_GRID = [0.02, 0.05, 0.10]
+
+
+def safe_rate(num, denom):
+    return round(num / max(denom, 1), 4)
 
 
 def evaluate_system():
@@ -98,6 +105,7 @@ def evaluate_system():
     }
 
     per_sender_eval = {}
+    per_sender_abstain = {}
 
     for s in all_senders:
         sid = s["sender_id"]
@@ -111,6 +119,9 @@ def evaluate_system():
             "holdout_count": len(holdout_emails),
             "alphas": {},
         }
+
+        s_too_short = 0
+        s_thin = 0
 
         # Evaluate across alphas
         for alpha in ALPHA_GRID:
@@ -149,10 +160,12 @@ def evaluate_system():
                     sc = res["sentence_count"]
                     if wc < 40 or sc < 3:
                         routing_stats["too_short_total"] += 1
+                        s_too_short += 1
                         if res["content_escalation"]:
                             routing_stats["too_short_escalated"] += 1
                     elif n_train < int(math.floor(1.0 / alpha)):
                         routing_stats["thin_history_total"] += 1
+                        s_thin += 1
                         if res["content_escalation"]:
                             routing_stats["thin_history_escalated"] += 1
 
@@ -179,6 +192,27 @@ def evaluate_system():
             }
 
         per_sender_eval[sid] = sender_entry
+        n_holdout = max(len(holdout_emails), 1)
+        per_sender_abstain[sid] = {
+            "abstain_rate": safe_rate(s_too_short, n_holdout),
+            "insufficient_history": safe_rate(s_thin, n_holdout),
+            "insufficient_history_count": s_thin,
+            "split_by_triage_reason": {
+                "insufficient_history": {
+                    "count": s_thin,
+                    "rate": safe_rate(s_thin, n_holdout),
+                },
+                "too_short": {
+                    "count": s_too_short,
+                    "rate": safe_rate(s_too_short, n_holdout),
+                },
+            },
+            "too_short": safe_rate(s_too_short, n_holdout),
+            "too_short_count": s_too_short,
+            "total_holdout": len(holdout_emails),
+            "triage_count": s_too_short + s_thin,
+            "triage_rate": safe_rate(s_too_short + s_thin, n_holdout),
+        }
 
     # -------------------------------------------------------------
     # 2. Evaluate Forged Recall (Flagged & Alert-Only across Tiers)
@@ -276,9 +310,6 @@ def evaluate_system():
                 forged_eval["short"]["flagged"] += 1
 
     # Calculate recall percentages
-    def safe_rate(num, denom):
-        return round(num / max(denom, 1), 4)
-
     recall_metrics = {
         "relabel": {
             "recall_flagged": safe_rate(forged_eval["relabel"]["flagged"], forged_eval["relabel"]["total"]),
@@ -476,7 +507,29 @@ def evaluate_system():
         key=lambda k: per_sender_eval[k]["alphas"]["0.05"]["FPR_alert"],
     )
 
+    # Canonical demo inbox abstain rate
+    demo_inbox_file = os.path.join(REPO_ROOT, "data", "demo_inbox.json")
+    demo_triage_count = 0
+    demo_msgs_count = 0
+    if os.path.exists(demo_inbox_file):
+        with open(demo_inbox_file, "r", encoding="utf-8") as f:
+            demo_msgs = json.load(f)
+        demo_msgs_count = len(demo_msgs)
+        for dm in demo_msgs:
+            d_res = score_message(dm["body"], "presto-k", alpha=0.05)
+            if d_res["verdict"] == "TRIAGE":
+                demo_triage_count += 1
+    abstain_rate_demo = safe_rate(demo_triage_count, demo_msgs_count)
+
+    abstain_rate_pooled = safe_rate(
+        routing_stats["too_short_total"],
+        calibration_data[0.05]["holdout_total"],
+    )
+
     metrics_payload = {
+        "abstain_rate_demo_inbox": abstain_rate_demo,
+        "abstain_rate_genuine_holdout_per_sender": per_sender_abstain,
+        "abstain_rate_genuine_holdout_pooled": abstain_rate_pooled,
         "attribution_no_match_rate_generic": safe_rate(generic_no_match_count, forged_eval["generic"]["total"]),
         "attribution_no_match_rate_styled": safe_rate(styled_no_match_count, forged_eval["styled_all"]["total"]),
         "attribution_top1_accuracy_relabel": safe_rate(relabel_top1_count, forged_eval["relabel"]["total"]),

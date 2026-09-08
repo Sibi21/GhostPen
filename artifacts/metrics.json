@@ -1,4 +1,308 @@
 {
+  "abstain_rate_demo_inbox": 0.2143,
+  "abstain_rate_genuine_holdout_per_sender": {
+    "badeer-r": {
+      "abstain_rate": 0.4286,
+      "insufficient_history": 0.5714,
+      "insufficient_history_count": 4,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 4,
+          "rate": 0.5714
+        },
+        "too_short": {
+          "count": 3,
+          "rate": 0.4286
+        }
+      },
+      "too_short": 0.4286,
+      "too_short_count": 3,
+      "total_holdout": 7,
+      "triage_count": 7,
+      "triage_rate": 1.0
+    },
+    "blair-l": {
+      "abstain_rate": 0.625,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 30,
+          "rate": 0.625
+        }
+      },
+      "too_short": 0.625,
+      "too_short_count": 30,
+      "total_holdout": 48,
+      "triage_count": 30,
+      "triage_rate": 0.625
+    },
+    "cash-m": {
+      "abstain_rate": 0.25,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 12,
+          "rate": 0.25
+        }
+      },
+      "too_short": 0.25,
+      "too_short_count": 12,
+      "total_holdout": 48,
+      "triage_count": 12,
+      "triage_rate": 0.25
+    },
+    "corman-s": {
+      "abstain_rate": 0.6042,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 29,
+          "rate": 0.6042
+        }
+      },
+      "too_short": 0.6042,
+      "too_short_count": 29,
+      "total_holdout": 48,
+      "triage_count": 29,
+      "triage_rate": 0.6042
+    },
+    "guzman-m": {
+      "abstain_rate": 0.4792,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 23,
+          "rate": 0.4792
+        }
+      },
+      "too_short": 0.4792,
+      "too_short_count": 23,
+      "total_holdout": 48,
+      "triage_count": 23,
+      "triage_rate": 0.4792
+    },
+    "hain-m": {
+      "abstain_rate": 0.0208,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 1,
+          "rate": 0.0208
+        }
+      },
+      "too_short": 0.0208,
+      "too_short_count": 1,
+      "total_holdout": 48,
+      "triage_count": 1,
+      "triage_rate": 0.0208
+    },
+    "heard-m": {
+      "abstain_rate": 0.5833,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 28,
+          "rate": 0.5833
+        }
+      },
+      "too_short": 0.5833,
+      "too_short_count": 28,
+      "total_holdout": 48,
+      "triage_count": 28,
+      "triage_rate": 0.5833
+    },
+    "keiser-k": {
+      "abstain_rate": 0.625,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 30,
+          "rate": 0.625
+        }
+      },
+      "too_short": 0.625,
+      "too_short_count": 30,
+      "total_holdout": 48,
+      "triage_count": 30,
+      "triage_rate": 0.625
+    },
+    "lay-k": {
+      "abstain_rate": 0.0208,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 1,
+          "rate": 0.0208
+        }
+      },
+      "too_short": 0.0208,
+      "too_short_count": 1,
+      "total_holdout": 48,
+      "triage_count": 1,
+      "triage_rate": 0.0208
+    },
+    "may-l": {
+      "abstain_rate": 0.375,
+      "insufficient_history": 0.625,
+      "insufficient_history_count": 5,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 5,
+          "rate": 0.625
+        },
+        "too_short": {
+          "count": 3,
+          "rate": 0.375
+        }
+      },
+      "too_short": 0.375,
+      "too_short_count": 3,
+      "total_holdout": 8,
+      "triage_count": 8,
+      "triage_rate": 1.0
+    },
+    "neal-s": {
+      "abstain_rate": 0.375,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 18,
+          "rate": 0.375
+        }
+      },
+      "too_short": 0.375,
+      "too_short_count": 18,
+      "total_holdout": 48,
+      "triage_count": 18,
+      "triage_rate": 0.375
+    },
+    "presto-k": {
+      "abstain_rate": 0.4375,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 21,
+          "rate": 0.4375
+        }
+      },
+      "too_short": 0.4375,
+      "too_short_count": 21,
+      "total_holdout": 48,
+      "triage_count": 21,
+      "triage_rate": 0.4375
+    },
+    "quigley-d": {
+      "abstain_rate": 0.6667,
+      "insufficient_history": 0.3333,
+      "insufficient_history_count": 2,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 2,
+          "rate": 0.3333
+        },
+        "too_short": {
+          "count": 4,
+          "rate": 0.6667
+        }
+      },
+      "too_short": 0.6667,
+      "too_short_count": 4,
+      "total_holdout": 6,
+      "triage_count": 6,
+      "triage_rate": 1.0
+    },
+    "ring-r": {
+      "abstain_rate": 0.2222,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 2,
+          "rate": 0.2222
+        }
+      },
+      "too_short": 0.2222,
+      "too_short_count": 2,
+      "total_holdout": 9,
+      "triage_count": 2,
+      "triage_rate": 0.2222
+    },
+    "scholtes-d": {
+      "abstain_rate": 0.4,
+      "insufficient_history": 0.0,
+      "insufficient_history_count": 0,
+      "split_by_triage_reason": {
+        "insufficient_history": {
+          "count": 0,
+          "rate": 0.0
+        },
+        "too_short": {
+          "count": 6,
+          "rate": 0.4
+        }
+      },
+      "too_short": 0.4,
+      "too_short_count": 6,
+      "total_holdout": 15,
+      "triage_count": 6,
+      "triage_rate": 0.4
+    }
+  },
+  "abstain_rate_genuine_holdout_pooled": 0.4019,
   "attribution_no_match_rate_generic": 0.1,
   "attribution_no_match_rate_styled": 0.0,
   "attribution_top1_accuracy_relabel": 0.03,
