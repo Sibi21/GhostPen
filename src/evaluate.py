@@ -239,6 +239,18 @@ def evaluate_system():
     generic_no_match_count = 0
     styled_no_match_count = 0
 
+    # Genuine holdout attribution top-1 accuracy
+    genuine_top1_count = 0
+    genuine_holdout_total = 0
+    for s in all_senders:
+        sid = s["sender_id"]
+        _, holdout = split_sender_data(sid)
+        for e in holdout:
+            genuine_holdout_total += 1
+            att = compute_attribution(e["body"], sid, alpha=0.05)
+            if not att["is_no_match"] and att["top_3"] and att["top_3"][0]["sender_id"] == sid:
+                genuine_top1_count += 1
+
     for f_rec in forged_records:
         sid = f_rec["sender"]
         tier = f_rec["tier"]
@@ -532,6 +544,7 @@ def evaluate_system():
         "abstain_rate_genuine_holdout_pooled": abstain_rate_pooled,
         "attribution_no_match_rate_generic": safe_rate(generic_no_match_count, forged_eval["generic"]["total"]),
         "attribution_no_match_rate_styled": safe_rate(styled_no_match_count, forged_eval["styled_all"]["total"]),
+        "attribution_top1_accuracy_genuine": safe_rate(genuine_top1_count, genuine_holdout_total),
         "attribution_top1_accuracy_relabel": safe_rate(relabel_top1_count, forged_eval["relabel"]["total"]),
         "detection_definition": DETECTION_DEFINITION_VERBATIM,
         "claim_discipline": CLAIM_DISCIPLINE_VERBATIM,

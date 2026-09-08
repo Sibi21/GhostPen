@@ -190,12 +190,12 @@ def slide_5(ax):
 
     ax.text(
         0.0,
-        0.05,
-        "Limitations & Roadmap: For reply-heavy senders whose mail is predominantly brief, stylometry abstains on a large share of messages\n(abstain rate per sender in metrics.json); such senders are protected mainly by the routing layer, which is why TRIAGE is never a silent pass.\nStyle drift requires rolling updates; low-volume senders need >=20 emails for alpha=0.05. Scaffolding human-reviewed.",
-        fontsize=8.0,
+        0.03,
+        "Limitations & Roadmap: For reply-heavy senders whose mail is predominantly brief, stylometry abstains on a large share of messages\n(abstain rate per sender in metrics.json); such senders are protected mainly by the routing layer, which is why TRIAGE is never a silent pass.\nCross-sender ranking is a forensic suggestion, not identification: a genuine message's p against its true author is uniform by construction,\nand boilerplate text (out-of-office, forwards) carries little personal signal, so ranks can shuffle on such mail. Measured top-1 accuracy on the relabel tier: 0.03.\nStyle drift requires rolling updates; low-volume senders need >=20 emails for alpha=0.05. Scaffolding human-reviewed.",
+        fontsize=7.3,
         color="#718096",
         style="italic",
-        linespacing=1.3,
+        linespacing=1.2,
     )
 
 

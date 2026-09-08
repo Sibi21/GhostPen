@@ -310,6 +310,7 @@ Baseline B (Global Threshold on S)     |   0.048   |  0.050   |   79.0%   |  82.
 ## 9. Limitations & AI Disclosure
 
 - **Reply-Heavy Senders**: For reply-heavy senders whose mail is predominantly brief, stylometry abstains on a large share of messages (abstain rate per sender in metrics.json); such senders are protected mainly by the routing layer, which is why TRIAGE is never a silent pass.
+- **Attribution Ranking**: Cross-sender ranking is a forensic suggestion, not identification: a genuine message's p against its true author is uniform by construction, and boilerplate text (out-of-office, forwards) carries little personal signal, so ranks can shuffle on such mail. Measured top-1 accuracy on the relabel tier: 0.03.
 - **Style Drift**: People change writing habits over time; rolling 6-month profile update windows are recommended for production.
 - **Low-Volume Senders**: Reliable conformal calibration at $\alpha=0.05$ requires $\ge 20$ training emails.
 - **Character 3-grams**: Topic vocabulary can subtly influence 3-grams; glue function words remain primary.

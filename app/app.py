@@ -33,6 +33,19 @@ from src.ingest import get_all_senders, resolve_sender_id
 from src.profile import load_null, load_profile
 from src.score import score_message
 
+METRICS_FILE = os.path.join(REPO_ROOT, "artifacts", "metrics.json")
+
+
+def load_metrics_cache():
+    if os.path.exists(METRICS_FILE):
+        try:
+            with open(METRICS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
 # Streamlit Page Config
 st.set_page_config(
     page_title="GhostPen — BEC Writing-Style Verification",
@@ -220,10 +233,18 @@ def main():
             n_tr = prof["n_train"] if prof else s.get("total_emails", 0)
             option_tooltips[dname] = f"{s['display_name']}: {n_tr} enrolled emails ({s['volume_class']})"
 
+    default_sender_idx = 0
+    query_sender = st.query_params.get("sender", "")
+    if query_sender:
+        for idx, lbl in enumerate(sender_options.keys()):
+            if query_sender.lower() in lbl.lower():
+                default_sender_idx = idx
+                break
+
     selected_label = st.sidebar.selectbox(
         "Active Executive Profile",
         list(sender_options.keys()),
-        index=0,
+        index=default_sender_idx,
         help="Select an executive profile. Hover over options or see legend below for volume class and training history.",
     )
     active_sender_id = sender_options[selected_label]
@@ -354,7 +375,7 @@ def main():
         elif not getattr(raw_messages, "has_short_genuine", True):
             st.info("Note: No genuine holdout messages under 40 words exist for this sender; short genuine slot omitted (13 messages total).")
 
-        # Create interactive selection radio
+        # Create interactive selection radio and sorting controls
         options = []
         for m in scored_inbox:
             v = m["res"]["verdict"]
@@ -362,13 +383,51 @@ def main():
             tier_tag = f" | [{m['category']}]" if reveal_truth else ""
             options.append(f"{m['id']} | [{v}]{esc_tag}{tier_tag} | {m['subject'][:30]}...")
 
-        selected_idx = st.selectbox(
-            "Select email to audit:",
-            range(len(options)),
-            format_func=lambda i: options[i],
-            key=f"audit_select_{active_sender_id}",
-        )
+        default_audit_idx = 0
+        query_audit = st.query_params.get("audit", "")
+        if query_audit:
+            for idx, m in enumerate(scored_inbox):
+                if query_audit.lower() in m["id"].lower() or query_audit == str(idx):
+                    default_audit_idx = idx
+                    break
+
+        col_audit, col_sort = st.columns([3, 2])
+        with col_audit:
+            selected_idx = st.selectbox(
+                "Select email to audit:",
+                range(len(options)),
+                index=default_audit_idx,
+                format_func=lambda i: options[i],
+                key=f"audit_select_{active_sender_id}",
+            )
+
+        default_sort_idx = 0
+        sort_opts = ["Default order", "Date (ascending)", "Date (descending)"]
+        query_sort = st.query_params.get("sort", "")
+        if query_sort:
+            for idx, opt in enumerate(sort_opts):
+                if query_sort.lower() in opt.lower():
+                    default_sort_idx = idx
+                    break
+
+        with col_sort:
+            sort_order = st.selectbox(
+                "Sort table by:",
+                options=sort_opts,
+                index=default_sort_idx,
+                key=f"sort_order_{active_sender_id}",
+                help="Sort incoming messages without modifying the underlying audit selection.",
+            )
         selected_item = scored_inbox[selected_idx]
+
+        # Prepare sorted display list while preserving _orig_idx for selection sync
+        indexed_inbox = [{**m, "_orig_idx": idx} for idx, m in enumerate(scored_inbox)]
+        if sort_order == "Date (ascending)":
+            display_inbox = sorted(indexed_inbox, key=lambda m: (m.get("date", ""), m["_orig_idx"]))
+        elif sort_order == "Date (descending)":
+            display_inbox = sorted(indexed_inbox, key=lambda m: (m.get("date", ""), m["_orig_idx"]), reverse=True)
+        else:
+            display_inbox = indexed_inbox
 
         # Plain display table (no column menu, no statistics bug)
         table_html = [
@@ -386,8 +445,9 @@ def main():
             table_html.append('<th>Ground Truth Tier</th>')
         table_html.append('</tr></thead><tbody>')
 
-        for idx, m in enumerate(scored_inbox):
-            is_selected = (idx == selected_idx)
+        for m in display_inbox:
+            orig_idx = m["_orig_idx"]
+            is_selected = (orig_idx == selected_idx)
             row_class = "mailbox-row selected-row" if is_selected else "mailbox-row"
             v = m["res"]["verdict"]
             v_class = f"badge-{v.lower()}"
@@ -400,7 +460,7 @@ def main():
             active_pill = ' <span style="color:#3182ce; font-size:0.68rem; font-weight:700;">[SELECTED]</span>' if is_selected else ''
 
             row_html = [
-                f'<tr class="{row_class}" data-idx="{idx}">',
+                f'<tr class="{row_class}" data-idx="{orig_idx}">',
                 f'<td class="cell-id"><b>{m["id"]}</b>{active_pill}</td>',
                 f'<td class="cell-date">{m["date"]}</td>',
                 f'<td class="cell-subject" title="{m["subject"]}">{subj}</td>',
@@ -533,26 +593,59 @@ def main():
                         unsafe_allow_html=True,
                     )
 
-        # A1: Attribution Panel — "Who actually wrote this?"
-        st.markdown("#### Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict)")
-        att = compute_attribution(selected_item["body"], active_sender_id, alpha=alpha)
-        if att["is_no_match"]:
-            st.warning("No enrolled author's style matches this message.")
-            st.caption(f"Claimed sender ({att['claimed_sender']['display_name']}): p = {att['claimed_sender']['p']:.4f}")
-        else:
-            cols = st.columns(len(att["top_3"]))
-            for idx, m in enumerate(att["top_3"]):
-                with cols[idx]:
-                    st.metric(
-                        f"#{idx + 1} Match",
-                        m["display_name"],
-                        f"p = {m['p']:.4f}",
-                        help=f"Deviation score S = {m['deviation_score']:.4f}",
-                    )
-            st.caption(
-                f"**Claimed sender contrast:** {att['claimed_sender']['display_name']} "
-                f"(p = `{att['claimed_sender']['p']:.4f}`, rank #{att['claimed_rank']})"
+        # P6.1 Attribution panel visibility rule:
+        # Show "Closest enrolled authors" ranking ONLY when verdict is ALERT,
+        # or TRIAGE with content_escalation = true (claimed sender rejected or abstained-with-flags).
+        is_alert = (verdict == "ALERT")
+        is_escalated_triage = (verdict == "TRIAGE" and res["content_escalation"])
+
+        if is_alert or is_escalated_triage:
+            metrics_data = load_metrics_cache()
+            relabel_acc = metrics_data.get("attribution_top1_accuracy_relabel", 0.03)
+
+            # P6.2 Honest framing of the ranking (tooltip + caption):
+            framing_text = (
+                "Cross-sender ranking is a forensic suggestion, not identification: a "
+                "genuine message's p against its true author is uniform by construction, "
+                "and boilerplate text (out-of-office, forwards) carries little personal "
+                f"signal, so ranks can shuffle on such mail. Measured top-1 accuracy on the "
+                f"relabel tier: {relabel_acc}."
             )
+            st.markdown(
+                f'<div title="{framing_text}">'
+                f'<h4>Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict)</h4>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+            st.caption(f"💡 *{framing_text}*")
+
+            att = compute_attribution(selected_item["body"], active_sender_id, alpha=alpha)
+            if att["is_no_match"]:
+                st.warning("No enrolled author's style matches this message.")
+                st.caption(f"Claimed sender ({att['claimed_sender']['display_name']}): p = {att['claimed_sender']['p']:.4f}")
+            else:
+                cols = st.columns(len(att["top_3"]))
+                for idx, m in enumerate(att["top_3"]):
+                    with cols[idx]:
+                        st.metric(
+                            f"#{idx + 1} Match",
+                            m["display_name"],
+                            f"p = {m['p']:.4f}",
+                            help=f"Deviation score S = {m['deviation_score']:.4f}",
+                        )
+                st.caption(
+                    f"**Claimed sender contrast:** {att['claimed_sender']['display_name']} "
+                    f"(p = `{att['claimed_sender']['p']:.4f}`, rank #{att['claimed_rank']})"
+                )
+        elif verdict == "OK":
+            # On OK messages, replace the panel with one line:
+            # "Verified as {claimed sender}. Attribution ranking is shown only for rejected messages."
+            claimed_display = name_clean
+            st.info(f"Verified as {claimed_display}. Attribution ranking is shown only for rejected messages.")
+        elif verdict == "TRIAGE":
+            # On plain TRIAGE (no escalation), show one line:
+            # "Stylometry abstained - no attribution suggested."
+            st.info("Stylometry abstained - no attribution suggested.")
 
         # 5. Directional Shift
         if res["direction"] != "Style variation within normal baseline":

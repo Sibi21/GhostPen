@@ -14,8 +14,8 @@ from typing import Dict, List, Optional, Tuple
 
 from src.features import extract_features
 from src.ingest import get_all_senders, resolve_sender_id
-from src.profile import compute_raw_score, load_profile
-from src.score import score_message
+from src.profile import compute_raw_score, load_null, load_profile
+from src.score import compute_p_value, determine_verdict, score_message
 
 METRICS_FILE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "artifacts", "metrics.json"
@@ -62,23 +62,50 @@ def compute_attribution(
     scored_candidates = []
     claimed_info = None
 
+    feats = extract_features(body)
+    word_count = feats["word_count"]
+    sentence_count = feats["sentence_count"]
+
     for s in all_senders:
         sid = s["sender_id"]
-        res = score_message(body, sid, alpha=alpha)
-        entry = {
-            "sender_id": sid,
-            "display_name": s["display_name"],
-            "p": res["p"],
-            "deviation_score": res["deviation_score"],
-            "n_train": res["n_train"],
-            "verdict": res["verdict"],
-        }
+        prof = load_profile(sid)
+        null_data = load_null(sid)
+        if prof and null_data:
+            raw_s, _ = compute_raw_score(feats, prof)
+            p_val, p_min = compute_p_value(raw_s, null_data["null_scores"])
+            n_train = prof["n_train"]
+            v, _ = determine_verdict(
+                sender_enrolled=True,
+                n_train=n_train,
+                word_count=word_count,
+                sentence_count=sentence_count,
+                p_value=p_val,
+                alpha=alpha,
+            )
+            entry = {
+                "sender_id": sid,
+                "display_name": s["display_name"],
+                "p": round(p_val, 4),
+                "deviation_score": round(raw_s, 4),
+                "n_train": n_train,
+                "verdict": v,
+            }
+        else:
+            res = score_message(body, sid, alpha=alpha)
+            entry = {
+                "sender_id": sid,
+                "display_name": s["display_name"],
+                "p": res["p"],
+                "deviation_score": res["deviation_score"],
+                "n_train": res["n_train"],
+                "verdict": res["verdict"],
+            }
         if sid == canonical_claimed:
             claimed_info = entry
 
         # Candidate eligibility for style alignment at level alpha:
         # sender must have calibrated history at alpha (n_train >= floor(1/alpha))
-        if res["n_train"] >= min_required_train:
+        if entry["n_train"] >= min_required_train:
             scored_candidates.append(entry)
 
     # If no sender satisfies min_required_train, fallback to all scored senders
