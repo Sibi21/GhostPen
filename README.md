@@ -1,44 +1,95 @@
-# GhostPen 🪶
+# GhostPen
 **Business Email Compromise (BEC) Detection via Writing-Style Verification**  
-*(v4.2-final — Hackathon Prototype)*
+*(v4.2-final)*
 
 > *"Your CFO's writing style is a password."*
 
 ---
 
-## 1. Quickstart (Under 5 Minutes, Zero Network)
+## 1. Quickstart (One-Click Launchers)
 
-GhostPen is 100% self-contained: all cleaned email profiles, null distributions, and forged evaluation benchmarks are pre-committed. No API keys, no downloads, and no network connections are needed at runtime.
+GhostPen is 100% self-contained: all cleaned email profiles, null distributions, and forged evaluation benchmarks are pre-committed in-repo. No API keys, external models, or network connections are needed at runtime.
 
-### Setup
+### One-Click Launch (Zero Manual Setup)
+
+GhostPen includes automated startup scripts that handle everything automatically — creating an isolated virtual environment (`.venv`), installing required dependencies, running pre-flight verification, launching the Streamlit interface, and opening your browser.
+
+- **Windows**: Double-click **`START_GHOSTPEN.bat`** (or run `.\START_GHOSTPEN.bat` in PowerShell/cmd).
+- **macOS / Linux**: Run **`./start_ghostpen.sh`** (or `bash start_ghostpen.sh`).
+
+*Subsequent launches skip dependency checks and start the dashboard in ~2 seconds.*
+
+---
+
+### How to Stop and Restart
+
+- **To Stop**: Click into the terminal window running GhostPen and press **`Ctrl + C`**.
+- **To Restart**: Simply double-click **`START_GHOSTPEN.bat`** (Windows) or run **`./start_ghostpen.sh`** (macOS/Linux) again.
+
+---
+
+### Manual Setup & Commands (Terminal Option)
+
+If you prefer to run the commands manually or want to explore the benchmark evaluation:
+
 ```bash
-# 1. Clone repository and navigate to directory
-cd GhostPen
+# 1. Create and activate an isolated virtual environment
+python -m venv .venv
 
-# 2. Install pinned dependencies (Python >= 3.10)
+# On Windows:
+.venv\Scripts\activate
+
+# On macOS/Linux:
+source .venv/bin/activate
+
+# 2. Install dependencies (supports Python 3.10 through 3.14)
 pip install -r requirements.txt
-```
 
-### Run
-```bash
-# Interactive Streamlit Demo (14-message CFO Inbox)
-make demo
+# 3. Run pre-flight readiness check
+python scripts/check_ready.py
 
-# Terminal CLI Fallback Demo
-make demo-cli
+# 4. Launch Interactive Streamlit Demo (14-message CFO Inbox)
+python -m streamlit run app/app.py
 
-# Run Full Benchmark Evaluation & Baselines
-make evaluate
+# 5. Run Fast Terminal CLI Demo
+python -m src.cli --demo
 
-# Run Automated Test Suite
-make test
+# 6. Run Full Benchmark Evaluation & Baselines
+python -m src.evaluate
 
-# Deterministic Rebuild of Profiles and Nulls
-make rebuild
+# 7. Run Unit and Sanity Test Suite
+python -m unittest tests/test_smoke.py
 
-# Generate 5-Page Submission Presentation PDF
+# 8. Rebuild Profiles and LOO Nulls from Data
+python -m src.profile --rebuild
+
+# 9. Generate 5-Page Presentation PDF
 python scripts/generate_slides.py
 ```
+
+---
+
+### Troubleshooting
+
+- **Python Not Found / "The term 'python' is not recognized"**:
+  - Install Python 3.10 or newer from [python.org/downloads](https://www.python.org/downloads/).
+  - **Important for Windows:** During installation, check the box: **`[X] Add python.exe to PATH`**.
+- **Port 8501 is already in use**:
+  - If a previous Streamlit process is still running in the background, close that command window, or start GhostPen on a different port:
+    ```bash
+    python -m streamlit run app/app.py --server.port 8502
+    ```
+- **Permission Denied on macOS / Linux (`./start_ghostpen.sh`)**:
+  - Make the script executable by running:
+    ```bash
+    chmod +x start_ghostpen.sh
+    ./start_ghostpen.sh
+    ```
+- **PowerShell Execution Policy Restrictions**:
+  - Running `START_GHOSTPEN.bat` bypasses PowerShell script execution policies because it runs through the standard Windows Command processor (`cmd.exe`).
+- **Missing `make` on Windows**:
+  - You do not need `make`. Simply use `START_GHOSTPEN.bat` or the direct `python -m ...` commands listed above.
+
 
 ---
 
