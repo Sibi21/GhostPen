@@ -29,7 +29,7 @@ from src.attribution import (
 )
 from src.demo_inbox import build_inbox
 from src.features import extract_features
-from src.ingest import get_all_senders, resolve_sender_id
+from src.ingest import display_name, get_all_senders, resolve_sender_id
 from src.profile import load_null, load_profile
 from src.score import score_message
 
@@ -219,19 +219,18 @@ def main():
     st.sidebar.header("Control Panel")
 
     senders_list = get_all_senders()
-    sender_options = {
-        "Marcus Hale (CFO)": "Marcus Hale",
-    }
-    option_tooltips = {
-        "Marcus Hale (CFO)": "Marcus Hale: 112 enrolled emails (high)",
-    }
+    sender_options = {}
+    option_tooltips = {}
+    vol_map = {}
     for s in senders_list:
-        if s["sender_id"] != "presto-k":
-            dname = f"{s['display_name']} ({s['volume_class'].upper()})"
-            sender_options[dname] = s["sender_id"]
-            prof = load_profile(s["sender_id"])
-            n_tr = prof["n_train"] if prof else s.get("total_emails", 0)
-            option_tooltips[dname] = f"{s['display_name']}: {n_tr} enrolled emails ({s['volume_class']})"
+        sid = s["sender_id"]
+        dname = display_name(sid)
+        vclass = s.get("volume_class", "high").upper()
+        vol_map[dname] = vclass
+        sender_options[dname] = sid
+        prof = load_profile(sid)
+        n_tr = prof["n_train"] if prof else s.get("total_emails", 0)
+        option_tooltips[dname] = f"{dname}: {n_tr} enrolled emails ({s.get('volume_class', 'high')})"
 
     default_sender_idx = 0
     query_sender = st.query_params.get("sender", "")
@@ -245,6 +244,8 @@ def main():
         "Active Executive Profile",
         list(sender_options.keys()),
         index=default_sender_idx,
+        format_func=lambda name: name if name.endswith((" (HIGH)", " (LOW)")) else f"{name} ({vol_map.get(name, 'HIGH')})",
+        key="active_sender_select",
         help="Select an executive profile. Hover over options or see legend below for volume class and training history.",
     )
     active_sender_id = sender_options[selected_label]
@@ -255,10 +256,15 @@ def main():
     st.sidebar.markdown(f"<div style='margin-top:-6px;margin-bottom:10px;'><small><b>Selected Profile:</b> <span title='{active_tooltip}'>{active_tooltip}</span></small></div>", unsafe_allow_html=True)
 
     # C1: Inject client-side option hover tooltips
+    option_tooltips_full = {}
+    for name, tt in option_tooltips.items():
+        option_tooltips_full[name] = tt
+        option_tooltips_full[f"{name} ({vol_map.get(name, 'HIGH')})"] = tt
+
     st.markdown(
         f"""
         <script>
-        const optionTooltips = {json.dumps(option_tooltips)};
+        const optionTooltips = {json.dumps(option_tooltips_full)};
         const observer = new MutationObserver(() => {{
             const options = parent.document.querySelectorAll('li[role="option"], div[role="option"]');
             options.forEach(opt => {{
@@ -365,9 +371,9 @@ def main():
     col_list, col_detail = st.columns([5.3, 6.7])
 
     with col_list:
-        display_name = getattr(raw_messages, "display_name", selected_label)
-        name_clean = display_name.split(" (")[0]
-        st.subheader(f"Incoming mail claiming to be {display_name}")
+        mailbox_display_name = display_name(active_sender_id)
+        name_clean = mailbox_display_name.split(" (")[0]
+        st.subheader(f"Incoming mail claiming to be {mailbox_display_name}")
         st.caption(f"These messages arrived with {name_clean}'s name on the From line. GhostPen checks whether the writing actually matches their enrolled history.")
 
         if getattr(raw_messages, "genuine_only", False):

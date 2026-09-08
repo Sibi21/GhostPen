@@ -13,7 +13,7 @@ import os
 from typing import Dict, List, Optional, Tuple
 
 from src.features import extract_features
-from src.ingest import get_all_senders, resolve_sender_id
+from src.ingest import display_name, get_all_senders, resolve_sender_id
 from src.profile import compute_raw_score, load_null, load_profile
 from src.score import compute_p_value, determine_verdict, score_message
 
@@ -84,7 +84,8 @@ def compute_attribution(
             )
             entry = {
                 "sender_id": sid,
-                "display_name": s["display_name"],
+                "display_name": display_name(sid),
+                "volume_class": s.get("volume_class", "high"),
                 "p": round(p_val, 4),
                 "deviation_score": round(raw_s, 4),
                 "n_train": n_train,
@@ -94,7 +95,8 @@ def compute_attribution(
             res = score_message(body, sid, alpha=alpha)
             entry = {
                 "sender_id": sid,
-                "display_name": s["display_name"],
+                "display_name": display_name(sid),
+                "volume_class": s.get("volume_class", "high"),
                 "p": res["p"],
                 "deviation_score": res["deviation_score"],
                 "n_train": res["n_train"],
@@ -113,7 +115,8 @@ def compute_attribution(
         scored_candidates = [
             {
                 "sender_id": s["sender_id"],
-                "display_name": s["display_name"],
+                "display_name": display_name(s["sender_id"]),
+                "volume_class": s.get("volume_class", "high"),
                 "p": score_message(body, s["sender_id"], alpha=alpha)["p"],
                 "deviation_score": score_message(body, s["sender_id"], alpha=alpha)["deviation_score"],
                 "n_train": s.get("total_emails", 0),
@@ -132,7 +135,8 @@ def compute_attribution(
         claimed_res = score_message(body, canonical_claimed, alpha=alpha)
         claimed_info = {
             "sender_id": canonical_claimed,
-            "display_name": sender_map.get(canonical_claimed, {}).get("display_name", canonical_claimed),
+            "display_name": display_name(canonical_claimed),
+            "volume_class": sender_map.get(canonical_claimed, {}).get("volume_class", "high"),
             "p": claimed_res["p"],
             "deviation_score": claimed_res["deviation_score"],
             "n_train": claimed_res["n_train"],

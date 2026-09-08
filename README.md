@@ -190,10 +190,10 @@ In both the Web dashboard and CLI, scored messages feature cross-profile stylome
 1. **Claimed Sender Matches (Genuine holdout email)**:
    ```text
    Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict):
-     #1 Match: Kevin Presto (VP Trading) (p = 0.9558)
+     #1 Match: Marcus Hale (CFO) (p = 0.9558)
      #2 Match: Shelley Corman (p = 0.9558)
      #3 Match: Kam Keiser (p = 0.9558)
-     Claimed sender contrast: Kevin Presto (VP Trading) (p = 0.9558, rank #1)
+     Claimed sender contrast: Marcus Hale (CFO) (p = 0.9558, rank #1)
    ```
 
 2. **Another Enrolled Sender Matches (Relabel impersonation attack)**:
@@ -202,7 +202,7 @@ In both the Web dashboard and CLI, scored messages feature cross-profile stylome
      #1 Match: Lynn Blair (p = 0.6637)
      #2 Match: Diana Scholtes (p = 0.5278)
      #3 Match: Kam Keiser (p = 0.4336)
-     Claimed sender contrast: Kevin Presto (VP Trading) (p = 0.1947, rank #6)
+     Claimed sender contrast: Marcus Hale (CFO) (p = 0.1947, rank #6)
    ```
    *The true author Lynn Blair ranks #1 with $p \ge 0.05$, exposing that the email was actually authored by someone else in the company.*
 
@@ -210,7 +210,7 @@ In both the Web dashboard and CLI, scored messages feature cross-profile stylome
    ```text
    Closest enrolled authors (among 15 enrolled senders - suggestion, not identification; never affects S or the verdict):
      No enrolled author's style matches this message.
-     Claimed sender (Kevin Presto (VP Trading)): p = 0.0177
+     Claimed sender (Marcus Hale (CFO)): p = 0.0177
    ```
    *When all calibrated authors have $p < \alpha$, nobody is named. This no-match state is itself a vital BEC indicator: the email reads like nobody in the company.*
 

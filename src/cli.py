@@ -14,6 +14,7 @@ import sys
 from typing import Optional
 
 from src.attribution import compute_attribution
+from src.ingest import display_name
 from src.score import score_message
 
 
@@ -25,7 +26,7 @@ def run_cli():
         "--sender",
         type=str,
         default=None,
-        help="Sender name, email, or alias (e.g., 'Marcus Hale, CFO', 'presto-k')",
+        help="Sender name, email, or alias (e.g., 'Marcus Hale (CFO)', 'presto-k')",
     )
     parser.add_argument(
         "--file",
@@ -95,7 +96,7 @@ def run_cli():
                 print(f"  #{idx + 1}: {m['display_name']} (p={m['p']:.4f})")
         print(f"  Claimed sender ({att['claimed_sender']['display_name']}): p={att['claimed_sender']['p']:.4f}")
     elif v == "OK":
-        print(f"\nVerified as {args.sender}. Attribution ranking is shown only for rejected messages.")
+        print(f"\nVerified as {display_name(args.sender).split(' (')[0]}. Attribution ranking is shown only for rejected messages.")
     elif v == "TRIAGE":
         print("\nStylometry abstained - no attribution suggested.")
 

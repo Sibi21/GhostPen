@@ -21,6 +21,8 @@ DEMO_ALIAS_MAP = {
     "marcus hale, cfo": "presto-k",
     "marcus hale (cfo)": "presto-k",
     "cfo": "presto-k",
+    "kevin presto": "presto-k",
+    "kevin presto (vp trading)": "presto-k",
 }
 
 
@@ -62,6 +64,27 @@ def resolve_sender_id(sender_identifier: str) -> Optional[str]:
         return clean
 
     return None
+
+
+def display_name(sender_identifier: str) -> str:
+    """
+    Returns the human-facing display name for a sender.
+    Reads data/senders.json, where the alias always wins over the raw profile display name.
+    Guarantees aliased sender (presto-k / Marcus Hale) renders as 'Marcus Hale (CFO)'.
+    """
+    if not sender_identifier:
+        return ""
+    canon = resolve_sender_id(sender_identifier) or sender_identifier
+    catalog = load_senders_catalog()
+    for s in catalog.get("senders", []):
+        if s["sender_id"] == canon:
+            alias = s.get("alias")
+            if alias:
+                if "marcus hale" in alias.lower():
+                    return "Marcus Hale (CFO)"
+                return alias
+            return s["display_name"]
+    return sender_identifier
 
 
 def load_sender_emails(sender_id: str) -> List[Dict]:
