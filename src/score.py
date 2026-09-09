@@ -140,14 +140,14 @@ def build_direction_and_habits(
     # 3. Directional shifts (formality, contractions, sentence variance)
     form_z = breakdown["z_scores"]["formality_rate"]["z_capped"]
     if form_z >= 1.5:
-        direction_notes.append(f"Formality +{form_z:.1f} sigma above his norm")
+        direction_notes.append(f"Formality +{form_z:.1f} sigma above baseline norm")
 
     contr_mean = profile["numeric_stats"]["contraction_rate"]["mean"]
     contr_obs = features["contraction_rate"]
     if contr_mean >= 1.0 and contr_obs == 0.0:
         direction_notes.append(f"Contractions {contr_mean:.1f}/100w -> 0.0")
     elif breakdown["z_scores"]["contraction_rate"]["z_capped"] <= -1.5:
-        direction_notes.append(f"Contractions {breakdown['z_scores']['contraction_rate']['z_capped']:.1f} sigma below his norm")
+        direction_notes.append(f"Contractions {breakdown['z_scores']['contraction_rate']['z_capped']:.1f} sigma below baseline norm")
 
     sent_std_z = breakdown["z_scores"]["sentence_len_std"]["z_capped"]
     if sent_std_z <= -1.5:
@@ -211,6 +211,7 @@ def score_message(
             "broken_habits": [],
             "context_flags": context_flags,
             "content_escalation": False,
+            "content_caution": False,
             "escalation_hint": None,
             "feature_contributions": [],
             "word_count": word_count,
@@ -255,6 +256,7 @@ def score_message(
         "broken_habits": broken_habits,
         "context_flags": context_flags,
         "content_escalation": content_escalation,
+        "content_caution": (verdict == "OK" and len(context_flags) >= 2),
         "escalation_hint": escalation_hint,
         "feature_contributions": feature_contributions[:5],
         "delta_breakdown": {

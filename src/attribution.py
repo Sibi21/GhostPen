@@ -169,7 +169,7 @@ def compute_attribution(
     }
 
 
-def extract_matched_habits(text: str, sender_id: str) -> List[Dict]:
+def extract_matched_habits(text: str, sender_id: str, prefix: str = "attacker matched:") -> List[Dict]:
     """
     Identifies features where |z| <= 1.0 vs the sender profile.
     Returns plain-English green-card descriptors and tooltip metadata.
@@ -184,13 +184,18 @@ def extract_matched_habits(text: str, sender_id: str) -> List[Dict]:
 
     matched_cards = []
 
+    pfx = (prefix or "").strip()
+    if pfx and not pfx.endswith(":"):
+        pfx = f"{pfx}:"
+    prefix_str = f"{pfx} " if pfx else ""
+
     # 1. Habitual sign-off match
     signoff_obs = features.get("signoff", "none")
     dom_sign = profile.get("dominant_signoff")
     dom_sign_cons = profile.get("dominant_signoff_consistency", 0.0)
     if signoff_obs and dom_sign and signoff_obs.lower() == dom_sign.lower() and signoff_obs != "none":
         matched_cards.append({
-            "title": f"attacker matched: signs '{signoff_obs}'",
+            "title": f"{prefix_str}signs '{signoff_obs}'",
             "detail": f"Matches habitual sign-off (observed {int(dom_sign_cons * 100)}% in enrolled mail)",
             "tooltip": "matched = within 1 of his own standard deviations",
             "category": "habit",
@@ -202,7 +207,7 @@ def extract_matched_habits(text: str, sender_id: str) -> List[Dict]:
     dom_greet_cons = profile.get("dominant_greeting_consistency", 0.0)
     if greet_obs and dom_greet and greet_obs.lower() == dom_greet.lower() and greet_obs != "none":
         matched_cards.append({
-            "title": f"attacker matched: greeting '{greet_obs}'",
+            "title": f"{prefix_str}greeting '{greet_obs}'",
             "detail": f"Matches habitual greeting (observed {int(dom_greet_cons * 100)}% in enrolled mail)",
             "tooltip": "matched = within 1 of his own standard deviations",
             "category": "habit",
@@ -214,7 +219,7 @@ def extract_matched_habits(text: str, sender_id: str) -> List[Dict]:
         if abs(z_val) <= 1.0:
             friendly = FEATURE_FRIENDLY_NAMES.get(key, f"Feature {key} normal")
             matched_cards.append({
-                "title": f"attacker matched: {friendly.lower()}",
+                "title": f"{prefix_str}{friendly.lower()}",
                 "detail": f"z = {z_val:+.2f} (profile mean: {info['mean']:.2f}, observed: {info['obs']:.2f})",
                 "tooltip": "matched = within 1 of his own standard deviations",
                 "category": "numeric",

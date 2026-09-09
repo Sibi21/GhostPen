@@ -148,7 +148,7 @@ Across the canonical Marcus Hale (CFO) demo inbox (also runnable directly via `m
   "n_train": 112,
   "verdict": "ALERT",
   "reason": "Stylometric deviation exceeds threshold (p=0.018 < alpha=0.05)",
-  "direction": "Formality +4.0 sigma above his norm",
+  "direction": "Formality +4.0 sigma above baseline norm",
   "broken_habits": [
     "Uses greeting 'dear' (observed 0% in past mail; usually 'none' 100%)",
     "Signs 'best_regards' (observed 0% in past mail; usually 'none' 77%)",

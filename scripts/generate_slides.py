@@ -110,7 +110,7 @@ def slide_3(ax):
         ("2. Target-Null Calibration", 
          "• N = n_train leave-one-out folds on sender mail\n• Conformal p = (1 + #{null >= S}) / (N + 1)\n• False Positive Rate becomes a dial:\n  alpha in {0.02, 0.05, 0.10}\n• Eliminates arbitrary score thresholding\n• Guaranteed conservative deployment FPR"),
         ("3. Direction of Deviation", 
-         "• Forgeries skew formal & generic, not just 'different'\n• Plain-English evidence cards:\n  'Formality +4.0 sigma above his norm'\n  'Signs Best regards; usually none 78%'\n• BEC context flags kept strictly separate from S\n  (preserves pure stylometric score)"),
+         "• Forgeries skew formal & generic, not just 'different'\n• Plain-English evidence cards:\n  'Formality +4.0 sigma above baseline norm'\n  'Signs Best regards; usually none 78%'\n• BEC context flags kept strictly separate from S\n  (preserves pure stylometric score)"),
         ("4. Abstain-and-Route Layer", 
          "• Short emails (<40 words) cannot be judged\n• TRIAGE is a ROUTING state, never a pass\n• Reason-agnostic escalation:\n  TRIAGE + >= 2 context flags -> route to payment\n  verification / secondary controls\n• Catches brevity-based evasion plays cleanly"),
     ]

@@ -6,7 +6,7 @@ Demonstrates:
 - 14-message CFO Inbox for Marcus Hale (8 genuine, 2 generic forged, 2 styled forged, 1 short benign, 1 short forged wire evasion)
 - Live alpha slider {0.02, 0.05, 0.10} with instant reactive re-verdicting
 - Reason-specific TRIAGE wording and red-bordered abstain-and-route escalation hints
-- Broken habits cards, directional shift analysis, and him-vs-this comparative stats
+- Broken habits cards, directional shift analysis, and baseline-vs-this comparative stats
 - 100% theme-adaptive (works seamlessly in both Light and Dark mode)
 """
 
@@ -183,6 +183,35 @@ st.markdown(
         font-weight: 800;
         padding: 2px 6px;
         border-radius: 3px;
+    }
+    .badge-caution {
+        background-color: rgba(210, 153, 34, 0.25);
+        color: #e3b341;
+        font-weight: 800;
+        padding: 2px 6px;
+        border-radius: 3px;
+        border: 1px solid rgba(210, 153, 34, 0.4);
+    }
+    .verdict-caution {
+        background-color: rgba(210, 153, 34, 0.15);
+        color: #e3b341;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-weight: bold;
+        border: 1px solid #d29922;
+        display: inline-block;
+        font-size: 1.05em;
+    }
+    .caution-banner {
+        background-color: rgba(210, 153, 34, 0.15);
+        color: #e3b341;
+        border: 2px solid #d29922;
+        padding: 14px;
+        border-radius: 8px;
+        margin-top: 12px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        line-height: 1.5;
     }
     .badge-tier {
         background-color: rgba(113, 128, 150, 0.2);
@@ -385,7 +414,8 @@ def main():
         options = []
         for m in scored_inbox:
             v = m["res"]["verdict"]
-            esc_tag = " [ESCALATED] " if m["res"]["content_escalation"] else ""
+            is_caution = m["res"].get("content_caution", False) or (v == "OK" and len(m["res"].get("context_flags", [])) >= 2)
+            esc_tag = " [ESCALATED] " if m["res"]["content_escalation"] else (" [CAUTION] " if is_caution else "")
             tier_tag = f" | [{m['category']}]" if reveal_truth else ""
             options.append(f"{m['id']} | [{v}]{esc_tag}{tier_tag} | {m['subject'][:30]}...")
 
@@ -457,7 +487,12 @@ def main():
             row_class = "mailbox-row selected-row" if is_selected else "mailbox-row"
             v = m["res"]["verdict"]
             v_class = f"badge-{v.lower()}"
-            esc = '<span class="badge badge-esc">YES</span>' if m["res"]["content_escalation"] else '<span style="opacity: 0.5;">-</span>'
+            if m["res"]["content_escalation"]:
+                esc = '<span class="badge badge-esc">YES</span>'
+            elif m["res"].get("content_caution", False) or (m["res"]["verdict"] == "OK" and len(m["res"].get("context_flags", [])) >= 2):
+                esc = '<span class="badge badge-caution">CAUTION</span>'
+            else:
+                esc = '<span style="opacity: 0.5;">-</span>'
             s_score = f"{m['res']['deviation_score']:.3f}"
             subj = m["subject"]
             if len(subj) > 36:
@@ -538,22 +573,37 @@ def main():
         verdict = res["verdict"]
 
         # 1. Verdict Banner
+        has_content_caution = res.get("content_caution", False) or (verdict == "OK" and len(res.get("context_flags", [])) >= 2)
         if verdict == "ALERT":
             st.markdown(f'<div class="verdict-alert">VERDICT: ALERT — Anomaly Detected (p={res["p"]:.3f} &lt; α={alpha})</div>', unsafe_allow_html=True)
         elif verdict == "OK":
-            st.markdown(f'<div class="verdict-ok">VERDICT: OK — Stylometrically Verified (p={res["p"]:.3f} &ge; α={alpha})</div>', unsafe_allow_html=True)
+            if has_content_caution:
+                st.markdown(f'<div class="verdict-caution">VERDICT: OK (Style p={res["p"]:.3f} &ge; α={alpha}) | CAUTION (High-Risk Content)</div>', unsafe_allow_html=True)
+            else:
+                st.markdown(f'<div class="verdict-ok">VERDICT: OK — Stylometrically Verified (p={res["p"]:.3f} &ge; α={alpha})</div>', unsafe_allow_html=True)
         elif verdict == "TRIAGE":
             st.markdown(f'<div class="verdict-triage">VERDICT: TRIAGE — Stylometry Abstained</div>', unsafe_allow_html=True)
         else:
             st.markdown(f'<div class="verdict-triage">VERDICT: UNENROLLED</div>', unsafe_allow_html=True)
 
-        # 2. Reason-Agnostic Escalation Banner
+        # 2. Reason-Agnostic Escalation Banner / Content Risk Advisory
         if res["content_escalation"]:
             st.markdown(
                 f"""
                 <div class="escalation-banner">
                     <b>ROUTING ACTION:</b> {res['escalation_hint']}<br>
                     <small><b>Detected High-Risk Context Flags:</b> {', '.join(res['context_flags'])}</small>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        elif has_content_caution:
+            st.markdown(
+                f"""
+                <div class="caution-banner">
+                    <b>CONTENT RISK ADVISORY:</b> Stylometric style matches baseline (p={res['p']:.3f} &ge; α={alpha}), but message contains high-risk BEC/financial keywords.<br>
+                    <small><b>Action Required:</b> Perform out-of-band wire/payment authorization verification before acting on this request.<br>
+                    <b>Detected High-Risk Context Flags:</b> {', '.join(res['context_flags'])}</small>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -568,7 +618,7 @@ def main():
             if res["word_count"] < 40 or res["sentence_count"] < 3:
                 gauge_subtext = "text too thin to judge reliably — routed to content controls"
             else:
-                gauge_subtext = "not enough of his past mail to calibrate at this alpha"
+                gauge_subtext = "not enough past emails to calibrate at this alpha"
             col_g2.metric("Conformal p-value", "abstained (n/a)", help=gauge_subtext)
             st.caption(f"*{gauge_subtext}* (raw score S={res['deviation_score']:.4f})")
         else:
@@ -580,16 +630,39 @@ def main():
         # 4. Broken Habits Cards
         st.markdown("#### Stylometric Deviations & Evidence")
         if res["broken_habits"]:
+            if verdict == "OK" and res.get("p", 1.0) < 0.20:
+                st.warning(
+                    f"**Borderline Stylometric Drift (p = {res['p']:.4f} vs threshold α = {alpha}):** "
+                    f"Specific habits deviate from baseline norm (see below), but overall function-word distance "
+                    f"remains within historical null variance (p >= α). Review habit evidence carefully."
+                )
             for bh in res["broken_habits"]:
                 st.markdown(f'<div class="broken-habit-pill">• {bh}</div>', unsafe_allow_html=True)
         else:
             st.success("All observed writing habits match the enrolled executive baseline.")
 
-        # A2: What the disguise got right (Matched Habits)
-        if verdict in ("ALERT", "TRIAGE"):
-            matched_cards = extract_matched_habits(selected_item["body"], active_sender_id)
+        # A2: Context-aware Matched Habits Panel (Patch P10)
+        is_alert_or_esc = (verdict == "ALERT") or (verdict == "TRIAGE" and res.get("content_escalation", False))
+        is_ok = (verdict == "OK")
+        is_plain_triage = (verdict == "TRIAGE" and not res.get("content_escalation", False))
+
+        if is_alert_or_esc:
+            matched_title = "What the disguise got right"
+            matched_prefix = "attacker matched:"
+        elif is_ok:
+            matched_title = "Habits matching the baseline"
+            matched_prefix = "matched:"
+        elif is_plain_triage:
+            matched_title = f"Habits within normal range (low confidence - {res['word_count']} words)"
+            matched_prefix = "within range:"
+        else:
+            matched_title = None
+            matched_prefix = None
+
+        if matched_title and matched_prefix:
+            matched_cards = extract_matched_habits(selected_item["body"], active_sender_id, prefix=matched_prefix)
             if matched_cards:
-                st.markdown("##### What the disguise got right")
+                st.markdown(f"##### {matched_title}")
                 for mc in matched_cards:
                     tt = mc["tooltip"]
                     title = mc["title"]
@@ -657,9 +730,9 @@ def main():
         if res["direction"] != "Style variation within normal baseline":
             st.info(f"**Direction of Shift:** {res['direction']}")
 
-        # 6. Him-vs-This Comparative Stats Table
+        # 6. Baseline-vs-This Comparative Stats Table
         if active_profile:
-            with st.expander("Him-vs-This Comparative Ledger", expanded=False):
+            with st.expander("Baseline-vs-This Comparative Ledger", expanded=False):
                 comp_rows = []
                 feats = extract_features(selected_item["body"])
 
