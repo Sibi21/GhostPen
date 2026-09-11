@@ -316,4 +316,3 @@ Baseline B (Global Threshold on S)     |   0.048   |  0.050   |   79.0%   |  82.
 - **Character 3-grams**: Topic vocabulary can subtly influence 3-grams; glue function words remain primary.
 - **English-Only**: Glue words and punctuation are tuned for English corporate communication.
 - **AI-Assistance Disclosure**: AI assistance: We used Antigravity and Gemini for two things. First, drafting the initial project skeleton: the file structure, setup files, and starter code outlines, which the team then filled in, reviewed, and rewrote. Second, writing the fake attack emails used for testing, saved offline in data/forged/forged.jsonl. The core design, the scoring and statistical method, the evaluation protocol, and every decision about them were made and reviewed by the team.
-- **Submission Slides**: The official 5-page PDF presentation is generated via `python scripts/generate_slides.py` and saved to `artifacts/GhostPen_Presentation.pdf`.
